@@ -16,7 +16,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme/theme';
 import AuthPage from './features/auth/AuthPage';
 import HomePage from './pages/HomePage';
-import MainLayout from './components/layout/MainLayout';
+import MainLayout from './components/layout/main/MainLayout';
 import ProfilePage from './features/users/ProfilePage';
 import CommunityPage from './features/posts/CommunityPage';
 import ResourcePage from './features/resources/ResourcePage';

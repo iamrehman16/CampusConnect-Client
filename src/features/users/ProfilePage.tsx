@@ -12,6 +12,10 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../../features/auth/context/AuthContext';
 
 import { useUser } from '../../features/users/context/UserContext';
 import EditableField from '../../components/common/EditableField';
@@ -23,6 +27,13 @@ const ProfilePage: React.FC = () => {
     const { user, updateUser, isLoading: userLoading, error: userError, retryFetch } = useUser();
     const [updateError, setUpdateError] = useState<string | null>(null);
     const [updateSuccess, setUpdateSuccess] = useState(false);
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
 
     // Format date for display
     const formatDate = (dateString?: string): string => {
@@ -212,6 +223,27 @@ const ProfilePage: React.FC = () => {
                     )}
                 </ProfileSection>
             )}
+            {/* Danger Zone / Logout */}
+            <Box sx={{ mt: 5, mb: 4, pt: 3, borderTop: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" color="error" sx={{ mb: 2, fontWeight: 600 }}>
+                    Account Actions
+                </Typography>
+                <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<LogoutIcon />}
+                    onClick={handleLogout}
+                    sx={{ 
+                        py: 1.5, 
+                        px: 4, 
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600
+                    }}
+                >
+                    Log Out of CampusConnect
+                </Button>
+            </Box>
         </Box>
     );
 };
