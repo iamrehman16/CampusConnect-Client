@@ -6,7 +6,7 @@
  *
  * Functions are grouped:
  *   Public  — fetchResources, fetchResourceById, downloadResource
- *   Auth    — createResource, updateOwnResource
+ *   Auth    — createResource, updateOwnResource, fetchMyResources, deleteOwnResource
  */
 
 import api from '../../../services/api';
@@ -35,6 +35,8 @@ const buildParams = (
     if (params.type) out.type = params.type;
     if (params.semester) out.semester = params.semester;
     if (params.sort) out.sort = params.sort;
+    if (params.status) out.status = params.status;
+    if (params.uploadedBy) out.uploadedBy = params.uploadedBy;
     if (params.page && params.page > 1) out.page = params.page;
     if (params.limit) out.limit = params.limit;
 
@@ -81,6 +83,18 @@ export const downloadResource = (id: string): void => {
 // ---------------------------------------------------------------------------
 
 /**
+ * fetchMyResources — contributors view their own uploads.
+ */
+export const fetchMyResources = async (
+    params: ResourceQueryParams = {},
+): Promise<PaginatedResponse<Resource>> => {
+    const response = await api.get<PaginatedResponse<Resource>>('/resources/my', {
+        params: buildParams(params),
+    });
+    return response.data;
+};
+
+/**
  * createResource — multipart/form-data upload.
  */
 export const createResource = async (
@@ -119,3 +133,9 @@ export const updateOwnResource = async (
     return response.data;
 };
 
+/**
+ * deleteOwnResource — contributor soft-deletes their own resource.
+ */
+export const deleteOwnResource = async (id: string): Promise<void> => {
+    await api.delete(`/resources/${id}/my`);
+};

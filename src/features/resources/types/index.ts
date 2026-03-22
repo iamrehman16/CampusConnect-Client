@@ -71,6 +71,8 @@ export interface ResourceQueryParams {
     type?: ResourceType;
     semester?: number;
     sort?: ResourceSort;
+    status?: ApprovalStatus;
+    uploadedBy?: string;
     page?: number;
     limit?: number;
 }

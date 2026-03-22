@@ -2,14 +2,10 @@
  * ResourceCard.tsx — Single Resource Display Card
  *
  * Mobile-first card component for displaying resource info.
- * Touch-friendly with 48px minimum tap targets.
- *
- * Optional `onEdit` callback renders a kebab/edit icon.
- * This keeps the card reusable across resource page (read-only)
- * and profile page (editable own resources) without duplication.
+ * Includes a kebab menu for contributors to Edit/Delete their own resources.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -20,6 +16,10 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 
 import DownloadIcon from '@mui/icons-material/Download';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
@@ -32,6 +32,8 @@ import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ArticleIcon from '@mui/icons-material/Article';
 import FolderIcon from '@mui/icons-material/Folder';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import type { Resource, ResourceType } from '../types';
 
@@ -52,8 +54,6 @@ const RESOURCE_ICON_MAP: Record<ResourceType, React.ElementType> = {
 
 const capitalize = (s: string): string => {
     if (!s) return s;
-    // The server values are already "PascalCase" or "Capitalized", 
-    // but some might have multiple words like PastPaper or ResearchPaper
     return s.replace(/([A-Z])/g, ' $1').trim();
 };
 
@@ -63,28 +63,22 @@ const formatFileSize = (bytes: number): string => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const formatDate = (iso: string): string => {
-    try {
-        return new Date(iso).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        });
-    } catch {
-        return iso;
-    }
+const formatDate = (dateStr: string): string => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    });
 };
 
-// ---------------------------------------------------------------------------
-// Props
 // ---------------------------------------------------------------------------
 
 interface ResourceCardProps {
     resource: Resource;
     onDownload: (id: string) => void;
     onSelect?: (resource: Resource) => void;
-    /** When provided, renders a kebab/edit action on the card. */
     onEdit?: (resource: Resource) => void;
+    onDelete?: (id: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -96,7 +90,33 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onDownload,
     onSelect,
     onEdit,
+    onDelete,
 }) => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = (event?: any) => {
+        if (event) event.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleEdit = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        handleMenuClose();
+        onEdit?.(resource);
+    };
+
+    const handleDelete = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        handleMenuClose();
+        onDelete?.(resource._id);
+    };
+
     const TypeIcon = RESOURCE_ICON_MAP[resource.resourceType] ?? FolderIcon;
 
     return (
@@ -109,18 +129,15 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                     boxShadow: 4,
                     transform: onSelect ? 'translateY(-2px)' : 'none',
                 },
-                '&:active': {
-                    transform: onSelect ? 'translateY(0)' : 'none',
-                },
                 border: 1,
                 borderColor: 'divider',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                position: 'relative',
             }}
         >
             <CardContent sx={{ flex: 1, pb: 1 }}>
-                {/* Header: Icon + Title + optional kebab */}
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
                     <Box
                         sx={{
@@ -152,28 +169,48 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             {resource.title}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            {resource.course} · Semester {resource.semester}
+                            {resource.course} · Sem {resource.semester}
                         </Typography>
                     </Box>
 
-                    {/* Optional edit/kebab — only rendered when onEdit is provided */}
-                    {onEdit && (
-                        <Tooltip title="Edit">
+                    {(onEdit || onDelete) && (
+                        <Box>
                             <IconButton
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onEdit(resource);
-                                }}
+                                aria-label="settings"
+                                aria-controls={open ? 'resource-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={open ? 'true' : undefined}
+                                onClick={handleMenuClick}
                                 size="small"
-                                sx={{ flexShrink: 0, minWidth: 40, minHeight: 40 }}
+                                sx={{ flexShrink: 0 }}
                             >
                                 <MoreVertIcon fontSize="small" />
                             </IconButton>
-                        </Tooltip>
+                            <Menu
+                                id="resource-menu"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleMenuClose}
+                                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                            >
+                                {onEdit && (
+                                    <MenuItem onClick={handleEdit}>
+                                        <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+                                        <ListItemText>Edit</ListItemText>
+                                    </MenuItem>
+                                )}
+                                {onDelete && (
+                                    <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+                                        <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+                                        <ListItemText>Delete</ListItemText>
+                                    </MenuItem>
+                                )}
+                            </Menu>
+                        </Box>
                     )}
                 </Box>
 
-                {/* Description (truncated) */}
                 {resource.description && (
                     <Typography
                         variant="body2"
@@ -185,92 +222,51 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
+                            fontSize: '0.85rem'
                         }}
                     >
                         {resource.description}
                     </Typography>
                 )}
 
-                {/* Tags */}
-                {resource.tags.length > 0 && (
-                    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-                        {resource.tags.slice(0, 3).map((tag) => (
-                            <Chip
-                                key={tag}
-                                label={tag}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: '0.7rem', height: 24 }}
-                            />
-                        ))}
-                        {resource.tags.length > 3 && (
-                            <Chip
-                                label={`+${resource.tags.length - 3}`}
-                                size="small"
-                                sx={{ fontSize: '0.7rem', height: 24 }}
-                            />
-                        )}
-                    </Stack>
-                )}
-
-                {/* Meta row */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        flexWrap: 'wrap',
-                        mt: 'auto',
-                    }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mt: 'auto' }}>
                     <Chip
                         label={capitalize(resource.resourceType)}
                         size="small"
                         color="primary"
-                        sx={{ fontSize: '0.7rem', height: 24 }}
+                        sx={{ fontSize: '0.7rem', height: 22 }}
                     />
-                    <Typography variant="caption" color="text.secondary">
-                        {formatFileSize(resource.fileSize)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        {formatDate(resource.createdAt)}
-                    </Typography>
+                    <Chip
+                        label={resource.approvalStatus}
+                        size="small"
+                        variant="outlined"
+                        color={
+                            resource.approvalStatus === 'Approved' ? 'success' : 
+                            resource.approvalStatus === 'Rejected' ? 'error' : 'warning'
+                        }
+                        sx={{ fontSize: '0.7rem', height: 22 }}
+                    />
                 </Box>
             </CardContent>
 
-            <CardActions
-                sx={{
-                    px: 2,
-                    pb: 1.5,
-                    pt: 0,
-                    justifyContent: 'space-between',
-                }}
-            >
-                {/* Stats */}
+            <CardActions sx={{ px: 2, pb: 1.5, pt: 0, justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <ThumbUpOutlinedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">
-                            {resource.upvotes?.length || 0}
-                        </Typography>
+                        <Typography variant="caption" color="text.secondary">{resource.upvotes?.length || 0}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <DownloadIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">
-                            {resource.downloads}
-                        </Typography>
+                        <Typography variant="caption" color="text.secondary">{resource.downloads}</Typography>
                     </Box>
                 </Box>
 
-                {/* Download button — 48x48 touch target */}
                 <Tooltip title="Download">
                     <IconButton
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDownload(resource._id);
-                        }}
+                        onClick={(e) => { e.stopPropagation(); onDownload(resource._id); }}
                         color="primary"
-                        sx={{ minWidth: 48, minHeight: 48 }}
+                        size="small"
+                        sx={{ minWidth: 40, minHeight: 40 }}
                     >
                         <DownloadIcon />
                     </IconButton>
