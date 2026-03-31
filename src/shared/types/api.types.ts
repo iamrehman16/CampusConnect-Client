@@ -1,11 +1,12 @@
 /**
  * Generic paginated response from the server.
  */
-export interface PaginatedResponse<T> {
+export interface PaginatedResult<T> {
   data: T[];
   total: number;
   page: number;
   limit: number;
+  totalPage: number;
 }
 
 /**
@@ -15,4 +16,10 @@ export interface ApiErrorResponse {
   statusCode: number;
   message: string | string[];
   error: string;
+}
+
+
+export interface PaginationParams{
+  page?:number;
+  limit?:number;
 }
