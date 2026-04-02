@@ -1,9 +1,4 @@
-// community.hooks.ts
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import communityService from "../services/community.service";
 import { communityKeys } from "./community.keys";
 import type {
@@ -13,7 +8,6 @@ import type {
   UpdatePostDto,
 } from "../types/community.dto";
 import { PAGE_LIMIT } from "@/shared/types/api.types";
-
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -43,23 +37,18 @@ export const useComments = (postId: string) =>
     enabled: !!postId,
   });
 
-// ─── Shared invalidation helpers ──────────────────────────────────────────────
-
-const useInvalidatePosts = () => {
-  const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: communityKeys.lists() });
+export const useStats = () => {
+  return useQuery({
+    queryKey: communityKeys.stats(),
+    queryFn: () => communityService.getPostStats(),
+    staleTime: 1000 * 60 * 5,
+  });
 };
 
-const useInvalidateComments = (postId: string) => {
-  const queryClient = useQueryClient();
-  return () =>
-    queryClient.invalidateQueries({ queryKey: communityKeys.comments(postId) });
-};
-
-// ─── Post Mutations ───────────────────────────────────────────────────────────
+// ─── Post mutations ───────────────────────────────────────────────────────────
 
 export const useCreatePost = () => {
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (dto: CreatePostDto) => communityService.createPost(dto),
     onSuccess: invalidatePosts,
@@ -67,7 +56,7 @@ export const useCreatePost = () => {
 };
 
 export const useUpdatePost = () => {
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: ({ postId, dto }: { postId: string; dto: UpdatePostDto }) =>
       communityService.updateOwnPost(postId, dto),
@@ -76,7 +65,7 @@ export const useUpdatePost = () => {
 };
 
 export const useDeletePost = () => {
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (postId: string) => communityService.deleteOwnPost(postId),
     onSuccess: invalidatePosts,
@@ -84,30 +73,29 @@ export const useDeletePost = () => {
 };
 
 export const useToggleUpvote = () => {
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (postId: string) => communityService.toggleUpvote(postId),
     onSuccess: invalidatePosts,
   });
 };
 
-// ─── Comment Mutations ────────────────────────────────────────────────────────
+// ─── Comment mutations ────────────────────────────────────────────────────────
 
 export const useCreateComment = (postId: string) => {
-  const invalidateComments = useInvalidateComments(postId);
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts, invalidateComments } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (dto: CreateCommentDto) =>
       communityService.createComment(postId, dto),
     onSuccess: () => {
-      invalidateComments();
+      invalidateComments(postId);
       invalidatePosts();
     },
   });
 };
 
 export const useUpdateComment = (postId: string) => {
-  const invalidateComments = useInvalidateComments(postId);
+  const { invalidateComments } = useCommunityInvalidation();
   return useMutation({
     mutationFn: ({
       commentId,
@@ -116,19 +104,30 @@ export const useUpdateComment = (postId: string) => {
       commentId: string;
       dto: UpdateCommentDto;
     }) => communityService.updateOwnComment(commentId, dto),
-    onSuccess: invalidateComments,
+    onSuccess: () => invalidateComments(postId),
   });
 };
 
 export const useDeleteComment = (postId: string) => {
-  const invalidateComments = useInvalidateComments(postId);
-  const invalidatePosts = useInvalidatePosts();
+  const { invalidatePosts, invalidateComments } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (commentId: string) =>
       communityService.deleteOwnComment(commentId),
     onSuccess: () => {
-      invalidateComments();
+      invalidateComments(postId);
       invalidatePosts();
     },
   });
+};
+
+
+// Helper Hooks
+const useCommunityInvalidation = () => {
+  const queryClient = useQueryClient();
+  return {
+    invalidatePosts: () =>
+      queryClient.invalidateQueries({ queryKey: communityKeys.lists() }),
+    invalidateComments: (postId: string) =>
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments(postId) }),
+  };
 };

@@ -48,3 +48,9 @@ export interface CreateCommentDto{
 export interface UpdateCommentDto{
     content?:string;
 }
+
+
+export interface PostStats{
+    total: number; //total posts
+    recent: number; //last seven days
+}

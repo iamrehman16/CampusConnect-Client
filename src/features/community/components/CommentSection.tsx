@@ -81,7 +81,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               disabled={isFetchingNextPage}
               sx={{ alignSelf: 'center', mt: 1 }}
             >
-              {isFetchingNextPage ? 'Loading more...' : 'Load Mode'}
+              {isFetchingNextPage ? 'Loading more...' : 'Read More'}
             </Button>
           )}
         </Stack>

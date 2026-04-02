@@ -1,6 +1,7 @@
 
 export const communityKeys = {
   all: ["posts"] as const,
+  stats:()=>[...communityKeys.all,'stats'],
   lists: () => [...communityKeys.all, "list"] as const,
   list: (params: object) => [...communityKeys.lists(), params] as const,
   detail: (postId: string) => [...communityKeys.all, postId] as const,
@@ -8,3 +9,4 @@ export const communityKeys = {
   commentList: (postId: string, params: object) =>
     [...communityKeys.comments(postId), params] as const,
 };
+

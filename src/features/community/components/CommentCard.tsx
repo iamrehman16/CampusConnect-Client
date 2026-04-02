@@ -62,7 +62,7 @@ export function CommentCard({ comment, postId }: CommentCardProps) {
         {comment.author.name?.[0]?.toUpperCase() || 'U'}
       </Avatar>
 
-      <Box sx={{ flexGrow: 1, bgcolor: 'action.hover', p: 1.5, borderRadius: 2 }}>
+      <Box sx={{ flexGrow: 1, bgcolor: 'action.hover', p: 1.5, borderRadius: 1 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             {comment.author.name || 'Unknown'}
