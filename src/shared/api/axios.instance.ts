@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { queryClient } from './query-client';
 
 /**
  * Pre-configured Axios instance.
@@ -96,6 +97,7 @@ api.interceptors.response.use(
         // Clear tokens and let AuthProvider handle redirect
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        queryClient.clear();
         window.location.href = '/auth';
         return Promise.reject(refreshError);
       } finally {

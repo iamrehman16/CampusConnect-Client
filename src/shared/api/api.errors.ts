@@ -3,7 +3,7 @@
  */
 export interface ApiError {
   statusCode: number;
-  message: string | string[];
+  message: string[];
   error: string;
 }
 

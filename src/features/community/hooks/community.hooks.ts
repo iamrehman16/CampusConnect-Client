@@ -8,6 +8,7 @@ import type {
   UpdatePostDto,
 } from "../types/community.dto";
 import { PAGE_LIMIT } from "@/shared/types/api.types";
+import toast from "react-hot-toast";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -19,7 +20,6 @@ export const usePosts = () =>
     initialPageParam: 1 as number,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
-    staleTime: 1000 * 60 * 5,
   });
 
 export const useComments = (postId: string) =>
@@ -33,7 +33,6 @@ export const useComments = (postId: string) =>
     initialPageParam: 1 as number,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
-    staleTime: 1000 * 60 * 5,
     enabled: !!postId,
   });
 
@@ -41,7 +40,6 @@ export const useStats = () => {
   return useQuery({
     queryKey: communityKeys.stats(),
     queryFn: () => communityService.getPostStats(),
-    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -51,7 +49,10 @@ export const useCreatePost = () => {
   const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (dto: CreatePostDto) => communityService.createPost(dto),
-    onSuccess: invalidatePosts,
+    onSuccess: ()=>{
+      invalidatePosts();
+      toast.success('Post created.');
+    },
   });
 };
 
@@ -60,7 +61,10 @@ export const useUpdatePost = () => {
   return useMutation({
     mutationFn: ({ postId, dto }: { postId: string; dto: UpdatePostDto }) =>
       communityService.updateOwnPost(postId, dto),
-    onSuccess: invalidatePosts,
+    onSuccess: ()=>{
+      invalidatePosts();
+      toast.success('Post created.');
+    },
   });
 };
 
@@ -68,10 +72,14 @@ export const useDeletePost = () => {
   const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (postId: string) => communityService.deleteOwnPost(postId),
-    onSuccess: invalidatePosts,
+    onSuccess: ()=>{
+      invalidatePosts();
+      toast.success('Post deleted.');
+    },
   });
 };
 
+// TODO: optimistic update — increment upvote count instantly, rollback on error
 export const useToggleUpvote = () => {
   const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
