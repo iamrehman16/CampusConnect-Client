@@ -4,6 +4,9 @@ import type {
   UpdateResourceDto,
   Resource,
   ResourceFilterParams,
+  UploadSignatureResponse,
+  CloudinaryUploadResult,
+  CreateResourcePayload,
 } from "../types/resource.dto";
 import type { PaginatedResult } from "@/shared/types/api.types";
 import api from "@/shared/api/axios.instance";
@@ -49,26 +52,26 @@ export class ResourceService {
 
   // ─── Contributor ──────────────────────────────────────────────────────────
 
-  // POST /resources — multipart/form-data upload
-  // file is separate from dto per our decision, service owns FormData construction
-  async createResource(dto: CreateResourceDto, file: File): Promise<Resource> {
-    const formData = new FormData();
+  // // POST /resources — multipart/form-data upload
+  // // file is separate from dto per our decision, service owns FormData construction
+  // async createResource(dto: CreateResourceDto, file: File): Promise<Resource> {
+  //   const formData = new FormData();
 
-    formData.append("file", file);
-    formData.append("title", dto.title);
-    formData.append("subject", dto.subject);
-    formData.append("course", dto.course);
-    formData.append("semester", String(dto.semester));
-    formData.append("resourceType", dto.resourceType);
+  //   formData.append("file", file);
+  //   formData.append("title", dto.title);
+  //   formData.append("subject", dto.subject);
+  //   formData.append("course", dto.course);
+  //   formData.append("semester", String(dto.semester));
+  //   formData.append("resourceType", dto.resourceType);
 
-    if (dto.description) formData.append("description", dto.description);
-    if (dto.tags?.length) formData.append("tags", JSON.stringify(dto.tags));
+  //   if (dto.description) formData.append("description", dto.description);
+  //   if (dto.tags?.length) formData.append("tags", JSON.stringify(dto.tags));
 
-    const { data } = await api.post<Resource>("/resources", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return data;
-  }
+  //   const { data } = await api.post<Resource>("/resources", formData, {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   });
+  //   return data;
+  // }
 
   // GET /resources/my — contributor's own resources regardless of approval status
   // backend reuses findAll with uploadedBy injected from JWT, mirrors that on frontend
@@ -91,6 +94,75 @@ export class ResourceService {
   // DELETE /resources/:id — contributor deleting their own resource
   async deleteResource(id: string): Promise<void> {
     await api.delete(`/resources/${id}`);
+  }
+
+
+  /**
+   * Signed upload flow — 3 steps, fully encapsulated here.
+   * Hook interface unchanged: still accepts { dto, file }.
+   */
+  async createResource(dto: CreateResourceDto, file: File): Promise<Resource> {
+    // Step 1 — get signature from your backend
+    const { data: signatureData } = await api.post<UploadSignatureResponse>(
+      "/resources/upload-signature",
+      { mimetype: file.type },
+    );
+
+    // Step 2 — upload directly to Cloudinary, bypassing your server
+    const cloudinaryResult = await this.uploadToCloudinary(file, signatureData);
+
+    // Step 3 — submit metadata + verified cloudinary result to your backend
+    const payload: CreateResourcePayload = {
+      // Academic metadata from the form
+      ...dto,
+      // Cloudinary result fields for server-side verification
+      publicId: cloudinaryResult.public_id,
+      secureUrl: cloudinaryResult.secure_url,
+      cloudinarySignature: cloudinaryResult.signature,
+      version: cloudinaryResult.version,
+      format: cloudinaryResult.format,
+      bytes: cloudinaryResult.bytes,
+      originalName: file.name,
+      cloudinaryResourceType: cloudinaryResult.resource_type,
+    };
+
+    const { data } = await api.post<Resource>("/resources", payload);
+    return data;
+  }
+
+  /**
+   * Direct upload to Cloudinary using signed params.
+   * Private — called only by createResource.
+   */
+  private async uploadToCloudinary(
+    file: File,
+    signatureData: UploadSignatureResponse,
+  ): Promise<CloudinaryUploadResult> {
+    const { signature, timestamp, folder, cloudinaryResourceType, apiKey, cloudName } =
+      signatureData;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", apiKey);
+    formData.append("timestamp", String(timestamp));
+    formData.append("signature", signature);
+    formData.append("folder", folder);
+    formData.append("tags", `user_${folder.split("/").pop()},pending_approval`);
+
+    // Cloudinary endpoint varies by resource type
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${cloudinaryResourceType}/upload`;
+
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Cloudinary upload failed: ${error?.error?.message ?? response.statusText}`);
+    }
+
+    return response.json() as Promise<CloudinaryUploadResult>;
   }
 }
 

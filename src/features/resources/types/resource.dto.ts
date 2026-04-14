@@ -38,6 +38,38 @@ export interface Resource {
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 
+
+export interface UploadSignatureResponse {
+  signature: string;
+  timestamp: number;
+  folder: string;
+  cloudinaryResourceType: "image" | "raw";
+  apiKey: string;
+  cloudName: string;
+}
+
+
+export interface CloudinaryUploadResult {
+  public_id: string;
+  version: number;
+  signature: string;
+  format: string;
+  bytes: number;
+  secure_url: string;
+  resource_type: "image" | "raw";
+}
+
+export interface CreateResourcePayload extends CreateResourceDto {
+  publicId: string;
+  secureUrl: string;
+  cloudinarySignature: string;
+  version: number;
+  format: string;
+  bytes: number;
+  originalName: string;
+  cloudinaryResourceType: "image" | "raw";
+}
+
 // what the form collects
 export interface CreateResourceForm {
   title: string;
@@ -86,8 +118,8 @@ interface ResourceBaseFilterParams extends PaginationParams {
   type?: ResourceType;
   semester?: number;
   sort?: ResourceSort;
-  status:ApprovalStatus;
-  uploadedBy:string;
+  status?:ApprovalStatus;
+  uploadedBy?:string;
 }
 
 // public — approved resources, no moderation concerns

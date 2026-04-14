@@ -13,7 +13,7 @@ import AuthPage from '@/features/auth/pages/AuthPage';
 import DashboardPage from '@/features/dashboard/pages/DashboardPage';
 
 // ── Lazy-loaded (code-split) ────────────────────────────────────────
-const ResourceListPage = lazy(() => import('@/features/resources/pages/ResourceListPage'));
+const ResourcePage = lazy(() => import('@/features/resources/pages/ResourcePage'));
 const ResourceDetailPage = lazy(() => import('@/features/resources/pages/ResourceDetailPage'));
 const AiChatPage = lazy(() => import('@/features/ai-chat/pages/AiChatPage'));
 const ChatPage = lazy(() => import('@/features/chat/pages/ChatPage'));
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
             path: ROUTES.RESOURCES,
             element: (
               <SuspenseWrapper>
-                <ResourceListPage />
+                <ResourcePage />
               </SuspenseWrapper>
             ),
           },

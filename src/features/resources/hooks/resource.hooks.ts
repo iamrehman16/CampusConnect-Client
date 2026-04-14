@@ -22,7 +22,9 @@ import toast from "react-hot-toast";
 /**
  * Public/Contributor resources list with infinite scrolling.
  */
-export const useResources = (params: Omit<ResourceFilterParams, "page" | "limit">) =>
+export const useResources = (
+  params: Omit<ResourceFilterParams, "page" | "limit">,
+) =>
   useInfiniteQuery({
     queryKey: resourceKeys.list(params),
     queryFn: ({ pageParam }: { pageParam: number }) =>
@@ -49,7 +51,9 @@ export const useResource = (id: string) =>
 /**
  * Contributor's own resources with infinite scrolling.
  */
-export const useMyResources = (params: Omit<ResourceFilterParams, "page" | "limit">) =>
+export const useMyResources = (
+  params: Omit<ResourceFilterParams, "page" | "limit">,
+) =>
   useInfiniteQuery({
     queryKey: resourceKeys.myList(params),
     queryFn: ({ pageParam }: { pageParam: number }) =>
@@ -67,7 +71,7 @@ export const useMyResources = (params: Omit<ResourceFilterParams, "page" | "limi
  * Admin: Pending resources moderation queue with infinite scrolling.
  */
 export const useAdminPendingResources = (
-  params: Omit<AdminResourceFilterParams, "page" | "limit">
+  params: Omit<AdminResourceFilterParams, "page" | "limit">,
 ) =>
   useInfiniteQuery({
     queryKey: resourceKeys.adminPendingList(params),
