@@ -7,13 +7,13 @@ export class AiChatService{
 
     async sendMessage(dto:ChatMessageDto):Promise<ChatResponseDto>{
 
-        const {data} = await api.post<ChatResponseDto>('chat',dto);
+        const {data} = await api.post<ChatResponseDto>('ai/chat',dto);
         return data;
 
     }
 
     async clearSession():Promise<ChatMessageDto>{
-        const {data} = await api.delete('chat/session');
+        const {data} = await api.delete('ai/chat/session');
         return data;
     }
 

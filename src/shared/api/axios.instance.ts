@@ -9,7 +9,7 @@ import { queryClient } from './query-client';
  * - Response interceptor: attempts silent token refresh on 401.
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL_CLOUD + '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL + '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
