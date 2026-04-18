@@ -6,7 +6,8 @@ import { MessageBubble } from '../components/MessageBubble';
 import { ChatInput } from '../components/ChatInput';
 import { ChatEmptyState } from '../components/ChatEmptyState';
 
-// Bottom nav height — keep in sync with your BottomNavigation component
+// Bottom nav height — keep in sync with your BottomNavigation component.
+// Only applied on mobile (xs/sm); desktop has no bottom nav.
 const BOTTOM_NAV_HEIGHT = 56;
 
 export default function AiChatPage() {
@@ -35,7 +36,11 @@ export default function AiChatPage() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: `calc(100dvh - ${BOTTOM_NAV_HEIGHT}px)`,
+        // On mobile the bottom nav eats 56px; desktop has no bottom nav
+        height: {
+          xs: `calc(100dvh - ${BOTTOM_NAV_HEIGHT}px)`,
+          md: '100dvh',
+        },
         bgcolor: 'background.default',
         overflow: 'hidden',
       }}
@@ -120,8 +125,7 @@ export default function AiChatPage() {
           px: 1.5,
           pt: 1,
           pb: 1.5,
-          bgcolor: 'background.paper',
-          borderTop: '1px solid',
+          bgcolor: 'background.default',
           borderColor: 'divider',
           flexShrink: 0,
         }}

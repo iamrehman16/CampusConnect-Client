@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Chip, Collapse, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import type { Citation } from '../types/ai-chat.dto';
 
 interface CitationsChipProps {
@@ -45,8 +47,15 @@ interface CitationItemProps {
 }
 
 function CitationItem({ citation, index }: CitationItemProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/resources/${citation.resourceId}`);
+  };
+
   return (
     <Box
+      onClick={handleClick}
       sx={{
         display: 'flex',
         alignItems: 'flex-start',
@@ -55,6 +64,15 @@ function CitationItem({ citation, index }: CitationItemProps) {
         border: '1px solid rgba(108, 99, 255, 0.12)',
         borderRadius: '8px',
         p: '7px 10px',
+        cursor: 'pointer',
+        transition: 'background-color 0.15s, border-color 0.15s',
+        '&:hover': {
+          bgcolor: 'rgba(108, 99, 255, 0.12)',
+          borderColor: 'rgba(108, 99, 255, 0.25)',
+        },
+        '&:active': {
+          bgcolor: 'rgba(108, 99, 255, 0.18)',
+        },
       }}
     >
       <Box
@@ -67,13 +85,14 @@ function CitationItem({ citation, index }: CitationItemProps) {
           alignItems: 'center',
           justifyContent: 'center',
           mt: '1px',
+          flexShrink: 0,
         }}
       >
         <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'primary.light' }}>
           {index}
         </Typography>
       </Box>
-      <Box>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'text.primary', lineHeight: 1.4 }}>
           {citation.title}
         </Typography>
@@ -81,6 +100,7 @@ function CitationItem({ citation, index }: CitationItemProps) {
           {citation.course} · Sem {citation.semester} · Page.{citation.pageNumber}
         </Typography>
       </Box>
+      <OpenInNewIcon sx={{ fontSize: 13, color: 'primary.light', opacity: 0.6, mt: '3px', flexShrink: 0 }} />
     </Box>
   );
 }

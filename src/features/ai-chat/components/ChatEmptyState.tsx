@@ -45,7 +45,7 @@ export function ChatEmptyState({ onSuggestionClick }: ChatEmptyStateProps) {
       </Typography>
 
       <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 260, lineHeight: 1.55 }}>
-        Ask me anything from your uploaded course resources.
+        Ask me anything from uploaded course resources.
       </Typography>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, justifyContent: 'center', mt: 0.5 }}>

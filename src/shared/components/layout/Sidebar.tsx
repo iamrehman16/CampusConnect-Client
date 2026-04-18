@@ -76,7 +76,7 @@ export default function Sidebar() {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          AcademiQ
+          CampusChamp
         </Typography>
       </Box>
 

@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+
+const MAX_CHARS = 1000;
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -18,7 +20,6 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
   if (prefillValue !== undefined && prefillValue !== value) {
     setValue(prefillValue);
     onPrefillConsumed?.();
-    // Focus after React flushes
     setTimeout(() => textareaRef.current?.focus(), 0);
   }
 
@@ -36,10 +37,9 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
 
   const handleSend = () => {
     const trimmed = value.trim();
-    if (!trimmed || disabled) return;
+    if (!trimmed || disabled || isOverLimit) return;
     onSend(trimmed);
     setValue('');
-    // Reset height
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
   };
 
@@ -50,69 +50,94 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
     }
   };
 
-  const canSend = value.trim().length > 0 && !disabled;
+  const charCount = value.length;
+  const isOverLimit = charCount > MAX_CHARS;
+  const showCounter = charCount > MAX_CHARS * 0.8; // show counter at 80% usage
+  const canSend = value.trim().length > 0 && !disabled && !isOverLimit;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: 1,
-        bgcolor: 'background.default',
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: '12px',
-        px: 1.75,
-        py: 1,
-        transition: 'border-color 0.15s',
-        '&:focus-within': { borderColor: 'rgba(108, 99, 255, 0.5)' },
-      }}
-    >
+    <Box>
       <Box
-        component="textarea"
-        ref={textareaRef}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Ask a question…"
-        rows={1}
         sx={{
-          flex: 1,
-          bgcolor: 'transparent',
-          border: 'none',
-          outline: 'none',
-          resize: 'none',
-          fontFamily: 'inherit',
-          fontSize: '0.875rem',
-          color: 'text.primary',
-          lineHeight: 1.55,
-          minHeight: '22px',
-          maxHeight: '120px',
-          py: 0.25,
-          '&::placeholder': { color: 'text.disabled' },
-        }}
-      />
-      <IconButton
-        onClick={handleSend}
-        disabled={!canSend}
-        size="small"
-        sx={{
-          width: 34,
-          height: 34,
-          borderRadius: '9px',
-          flexShrink: 0,
-          background: canSend
-            ? 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)'
-            : 'rgba(108, 99, 255, 0.15)',
-          color: '#fff',
-          transition: 'opacity 0.15s, transform 0.1s',
-          '&:hover': { opacity: 0.88, background: 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)' },
-          '&:active': { transform: 'scale(0.93)' },
-          '&.Mui-disabled': { color: 'rgba(255,255,255,0.3)' },
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 1,
+          bgcolor: 'background.default',
+          border: '1px solid',
+          borderColor: isOverLimit ? 'error.main' : 'divider',
+          borderRadius: '12px',
+          px: 1.75,
+          py: 1,
+          transition: 'border-color 0.15s',
+          '&:focus-within': {
+            borderColor: isOverLimit ? 'error.main' : 'rgba(108, 99, 255, 0.5)',
+          },
         }}
       >
-        <ArrowUpwardIcon sx={{ fontSize: 18 }} />
-      </IconButton>
+        <Box
+          component="textarea"
+          ref={textareaRef}
+          value={value}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask a question…"
+          rows={1}
+          sx={{
+            flex: 1,
+            bgcolor: 'transparent',
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            fontFamily: 'inherit',
+            fontSize: '0.875rem',
+            color: 'text.primary',
+            lineHeight: 1.55,
+            minHeight: '22px',
+            maxHeight: '120px',
+            py: 0.25,
+            '&::placeholder': { color: 'text.disabled' },
+          }}
+        />
+        <IconButton
+          onClick={handleSend}
+          disabled={!canSend}
+          size="small"
+          sx={{
+            width: 34,
+            height: 34,
+            borderRadius: '9px',
+            flexShrink: 0,
+            background: canSend
+              ? 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)'
+              : 'rgba(108, 99, 255, 0.15)',
+            color: '#fff',
+            transition: 'opacity 0.15s, transform 0.1s',
+            '&:hover': { opacity: 0.88, background: 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)' },
+            '&:active': { transform: 'scale(0.93)' },
+            '&.Mui-disabled': { color: 'rgba(255,255,255,0.3)' },
+          }}
+        >
+          <ArrowUpwardIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </Box>
+
+      {/* Character counter — only visible at 80%+ usage */}
+      {showCounter && (
+        <Typography
+          variant="caption"
+          sx={{
+            display: 'block',
+            textAlign: 'right',
+            mt: 0.5,
+            pr: 0.5,
+            color: isOverLimit ? 'error.main' : 'text.secondary',
+            fontWeight: isOverLimit ? 600 : 400,
+            transition: 'color 0.15s',
+          }}
+        >
+          {charCount} / {MAX_CHARS}
+        </Typography>
+      )}
     </Box>
   );
 }
