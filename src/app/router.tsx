@@ -22,8 +22,6 @@ const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
 
 // Admin pages — completely isolated bundle
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
-const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage'));
-const AdminResourcesPage = lazy(() => import('@/features/admin/pages/AdminResourcesPage'));
 
 /**
  * Wraps a lazy component with Suspense fallback.
@@ -127,22 +125,6 @@ const router = createBrowserRouter([
                 element: (
                   <SuspenseWrapper>
                     <AdminDashboardPage />
-                  </SuspenseWrapper>
-                ),
-              },
-              {
-                path: ROUTES.ADMIN_USERS,
-                element: (
-                  <SuspenseWrapper>
-                    <AdminUsersPage />
-                  </SuspenseWrapper>
-                ),
-              },
-              {
-                path: ROUTES.ADMIN_RESOURCES,
-                element: (
-                  <SuspenseWrapper>
-                    <AdminResourcesPage />
                   </SuspenseWrapper>
                 ),
               },
