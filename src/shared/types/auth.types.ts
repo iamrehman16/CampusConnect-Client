@@ -14,6 +14,7 @@ export interface User {
   accountStatus: UserStatus;
   createdAt: string;
   updatedAt: string;
+  semester?:number;
 }
 
 /**

@@ -18,7 +18,7 @@ const ResourceDetailPage = lazy(() => import('@/features/resources/pages/Resourc
 const AiChatPage = lazy(() => import('@/features/ai-chat/pages/AiChatPage'));
 const ChatPage = lazy(() => import('@/features/chat/pages/ChatPage'));
 const CommunityPage = lazy(() => import('@/features/community/pages/CommunityPage'));
-const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
+const ProfilePage = lazy(() => import('@/features/user/pages/ProfilePage'));
 
 // Admin pages — completely isolated bundle
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
