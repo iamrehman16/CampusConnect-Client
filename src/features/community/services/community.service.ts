@@ -1,7 +1,15 @@
-import type { PaginatedResult, PaginationParams } from "@/shared/types/api.types";
 import type {
-  Comment, CreateCommentDto, CreatePostDto,
-  Post, PostStats, UpdateCommentDto, UpdatePostDto,
+  PaginatedResult,
+  PaginationParams,
+} from "@/shared/types/api.types";
+import type {
+  Comment,
+  CreateCommentDto,
+  CreatePostDto,
+  Post,
+  PostStats,
+  UpdateCommentDto,
+  UpdatePostDto,
 } from "../types/community.dto";
 import api from "@/shared/api/axios.instance";
 
@@ -11,8 +19,31 @@ export class CommunityService {
     return data;
   }
 
-  async getCommentsByPostId(postId: string, params: PaginationParams): Promise<PaginatedResult<Comment>> {
-    const { data } = await api.get<PaginatedResult<Comment>>(`/posts/${postId}/comments`, { params });
+  async getOwnPosts(params: PaginationParams): Promise<PaginatedResult<Post>> {
+    const { data } = await api.get<PaginatedResult<Post>>("/posts/my", {
+      params,
+    });
+    return data;
+  }
+
+  async getPostsByUser(
+    params: PaginationParams,
+    id: string,
+  ): Promise<PaginatedResult<Post>> {
+    const { data } = await api.get<PaginatedResult<Post>>(`/posts/user/${id}`, {
+      params,
+    });
+    return data;
+  }
+
+  async getCommentsByPostId(
+    postId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResult<Comment>> {
+    const { data } = await api.get<PaginatedResult<Comment>>(
+      `/posts/${postId}/comments`,
+      { params },
+    );
     return data;
   }
 
@@ -35,8 +66,14 @@ export class CommunityService {
     return data;
   }
 
-  async updateOwnComment(commentId: string, dto: UpdateCommentDto): Promise<Comment> {
-    const { data } = await api.patch<Comment>(`/posts/comments/${commentId}`, dto);
+  async updateOwnComment(
+    commentId: string,
+    dto: UpdateCommentDto,
+  ): Promise<Comment> {
+    const { data } = await api.patch<Comment>(
+      `/posts/comments/${commentId}`,
+      dto,
+    );
     return data;
   }
 
@@ -49,8 +86,8 @@ export class CommunityService {
     return data;
   }
 
-  async getPostStats():Promise<PostStats>{
-    const {data} = await api.get<PostStats>(`/posts/stats`);
+  async getPostStats(): Promise<PostStats> {
+    const { data } = await api.get<PostStats>(`/posts/stats`);
     return data;
   }
 }

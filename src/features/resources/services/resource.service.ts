@@ -52,27 +52,6 @@ export class ResourceService {
 
   // ─── Contributor ──────────────────────────────────────────────────────────
 
-  // // POST /resources — multipart/form-data upload
-  // // file is separate from dto per our decision, service owns FormData construction
-  // async createResource(dto: CreateResourceDto, file: File): Promise<Resource> {
-  //   const formData = new FormData();
-
-  //   formData.append("file", file);
-  //   formData.append("title", dto.title);
-  //   formData.append("subject", dto.subject);
-  //   formData.append("course", dto.course);
-  //   formData.append("semester", String(dto.semester));
-  //   formData.append("resourceType", dto.resourceType);
-
-  //   if (dto.description) formData.append("description", dto.description);
-  //   if (dto.tags?.length) formData.append("tags", JSON.stringify(dto.tags));
-
-  //   const { data } = await api.post<Resource>("/resources", formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-  //   return data;
-  // }
-
   // GET /resources/my — contributor's own resources regardless of approval status
   // backend reuses findAll with uploadedBy injected from JWT, mirrors that on frontend
   async getMyResources(
@@ -81,6 +60,17 @@ export class ResourceService {
     const { data } = await api.get<PaginatedResult<Resource>>("/resources/my", {
       params,
     });
+    return data;
+  }
+
+  async getResourcesByUser(
+    id: string,
+    params: ResourceFilterParams,
+  ): Promise<PaginatedResult<Resource>> {
+    const { data } = await api.get<PaginatedResult<Resource>>(
+      `/resources/user/${id}`,
+      { params },
+    );
     return data;
   }
 
@@ -95,7 +85,6 @@ export class ResourceService {
   async deleteResource(id: string): Promise<void> {
     await api.delete(`/resources/${id}`);
   }
-
 
   /**
    * Signed upload flow — 3 steps, fully encapsulated here.
@@ -138,8 +127,14 @@ export class ResourceService {
     file: File,
     signatureData: UploadSignatureResponse,
   ): Promise<CloudinaryUploadResult> {
-    const { signature, timestamp, folder, cloudinaryResourceType, apiKey, cloudName } =
-      signatureData;
+    const {
+      signature,
+      timestamp,
+      folder,
+      cloudinaryResourceType,
+      apiKey,
+      cloudName,
+    } = signatureData;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -159,7 +154,9 @@ export class ResourceService {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Cloudinary upload failed: ${error?.error?.message ?? response.statusText}`);
+      throw new Error(
+        `Cloudinary upload failed: ${error?.error?.message ?? response.statusText}`,
+      );
     }
 
     return response.json() as Promise<CloudinaryUploadResult>;

@@ -11,6 +11,7 @@ export const ROUTES = {
   CHAT: '/chat',
   COMMUNITY: '/community',
   PROFILE: '/profile',
+  PUBLIC_PROFILE: '/profile/:userId',
   ADMIN: '/admin',
   ADMIN_USERS: '/admin/users',
   ADMIN_RESOURCES: '/admin/resources',

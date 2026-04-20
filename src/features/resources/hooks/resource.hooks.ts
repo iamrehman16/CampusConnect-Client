@@ -67,6 +67,24 @@ export const useMyResources = (
       lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
   });
 
+export const useResourcesByUser = (
+  userId: string,
+  params: Omit<ResourceFilterParams, "page" | "limit">,
+) =>
+  useInfiniteQuery({
+    queryKey: resourceKeys.userList(userId, params),
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      resourceService.getResourcesByUser(userId, {
+        ...params,
+        page: pageParam,
+        limit: PAGE_LIMIT,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
+    enabled: !!userId, // Prevent fetching if userId is undefined/empty
+  });
+
 /**
  * Admin: Pending resources moderation queue with infinite scrolling.
  */

@@ -10,6 +10,8 @@ export interface UpdateUserDto{
     name?:string;
     academicInfo?:string;
     expertise?:string;
+    semester?:number;
+    password?:string;
 }
 
 export interface UpdateUserStatusDto{

@@ -9,6 +9,11 @@ export const resourceKeys = {
   details: () => [...resourceKeys.all, "detail"] as const,
   detail: (id: string) => [...resourceKeys.details(), id] as const,
 
+  // New: Resources by specific User ID
+  byUser: (userId: string) => [...resourceKeys.all, "user", userId] as const,
+  userList: (userId: string, params: object) =>
+    [...resourceKeys.byUser(userId), params] as const,
+
   // Contributor's own resources
   mine: () => [...resourceKeys.all, "mine"] as const,
   myList: (params: object) => [...resourceKeys.mine(), params] as const,

@@ -19,7 +19,7 @@ const AiChatPage = lazy(() => import('@/features/ai-chat/pages/AiChatPage'));
 const ChatPage = lazy(() => import('@/features/chat/pages/ChatPage'));
 const CommunityPage = lazy(() => import('@/features/community/pages/CommunityPage'));
 const ProfilePage = lazy(() => import('@/features/user/pages/ProfilePage'));
-
+const PublicProfilePage = lazy(()=> import('@/features/user/pages/PublicProfilePage'))
 // Admin pages — completely isolated bundle
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
 
@@ -115,6 +115,16 @@ const router = createBrowserRouter([
               </SuspenseWrapper>
             ),
           },
+
+          {
+            path: ROUTES.PUBLIC_PROFILE,
+            element: (
+              <SuspenseWrapper>
+                <PublicProfilePage />
+              </SuspenseWrapper>
+            ),
+          },
+
 
           // ── Admin routes (role-gated) ─────────────────────────
           {

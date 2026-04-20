@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import communityService from "../services/community.service";
 import { communityKeys } from "./community.keys";
 import type {
@@ -43,15 +48,47 @@ export const useStats = () => {
   });
 };
 
+// ─── User Specific Post Queries ──────────────────────────────────────────────
+
+/**
+ * Fetches the authenticated user's own posts
+ */
+export const useOwnPosts = () =>
+  useInfiniteQuery({
+    queryKey: communityKeys.mine(),
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      communityService.getOwnPosts({ page: pageParam, limit: PAGE_LIMIT }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
+  });
+
+/**
+ * Fetches posts for a specific user ID
+ */
+export const usePostsByUser = (userId: string) =>
+  useInfiniteQuery({
+    queryKey: communityKeys.byUser(userId),
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      communityService.getPostsByUser(
+        { page: pageParam, limit: PAGE_LIMIT },
+        userId,
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
+    enabled: !!userId, // Only fetch if userId is provided
+  });
+
 // ─── Post mutations ───────────────────────────────────────────────────────────
 
 export const useCreatePost = () => {
   const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (dto: CreatePostDto) => communityService.createPost(dto),
-    onSuccess: ()=>{
+    onSuccess: () => {
       invalidatePosts();
-      toast.success('Post created.');
+      toast.success("Post created.");
     },
   });
 };
@@ -61,9 +98,9 @@ export const useUpdatePost = () => {
   return useMutation({
     mutationFn: ({ postId, dto }: { postId: string; dto: UpdatePostDto }) =>
       communityService.updateOwnPost(postId, dto),
-    onSuccess: ()=>{
+    onSuccess: () => {
       invalidatePosts();
-      toast.success('Post created.');
+      toast.success("Post created.");
     },
   });
 };
@@ -72,9 +109,9 @@ export const useDeletePost = () => {
   const { invalidatePosts } = useCommunityInvalidation();
   return useMutation({
     mutationFn: (postId: string) => communityService.deleteOwnPost(postId),
-    onSuccess: ()=>{
+    onSuccess: () => {
       invalidatePosts();
-      toast.success('Post deleted.');
+      toast.success("Post deleted.");
     },
   });
 };
@@ -128,14 +165,18 @@ export const useDeleteComment = (postId: string) => {
   });
 };
 
-
 // Helper Hooks
 const useCommunityInvalidation = () => {
   const queryClient = useQueryClient();
   return {
-    invalidatePosts: () =>
-      queryClient.invalidateQueries({ queryKey: communityKeys.lists() }),
+    invalidatePosts: () => {
+      // This will invalidate ANY query that starts with ["posts", "list"]
+      // including usePosts, useOwnPosts, and usePostsByUser
+      queryClient.invalidateQueries({ queryKey: communityKeys.lists() });
+    },
     invalidateComments: (postId: string) =>
-      queryClient.invalidateQueries({ queryKey: communityKeys.comments(postId) }),
+      queryClient.invalidateQueries({
+        queryKey: communityKeys.comments(postId),
+      }),
   };
 };

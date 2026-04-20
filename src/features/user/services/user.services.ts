@@ -4,7 +4,17 @@ import api from "@/shared/api/axios.instance";
 
 export class UserService {
   async updateUser(dto: UpdateUserDto): Promise<User> {
-    const { data } = await api.patch<User>("profile", { dto });
+    const { data } = await api.patch<User>("/users/profile", dto);
+    return data;
+  }
+
+  async getMyProfile(): Promise<User> {
+    const { data } = await api.get<User>("/users/profile");
+    return data;
+  }
+
+  async getUserProfile(id: string): Promise<User> {
+    const { data } = await api.get<User>(`/users/profile/${id}`);
     return data;
   }
 }
