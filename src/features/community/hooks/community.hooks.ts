@@ -12,7 +12,7 @@ import type {
   UpdateCommentDto,
   UpdatePostDto,
 } from "../types/community.dto";
-import { PAGE_LIMIT } from "@/shared/types/api.types";
+import { PAGE_LIMIT, type PaginatedResult } from "@/shared/types/api.types";
 import toast from "react-hot-toast";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -116,12 +116,44 @@ export const useDeletePost = () => {
   });
 };
 
-// TODO: optimistic update — increment upvote count instantly, rollback on error
 export const useToggleUpvote = () => {
-  const { invalidatePosts } = useCommunityInvalidation();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (postId: string) => communityService.toggleUpvote(postId),
-    onSuccess: invalidatePosts,
+
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: communityKeys.lists() });
+      const previousData = queryClient.getQueryData(communityKeys.lists());
+
+      queryClient.setQueriesData({ queryKey: communityKeys.lists() }, (old) =>
+        updatePostInCache(old, postId, (post) => ({
+          ...post,
+          isUpvoted: !post.isUpvoted,
+          upvoteCount: post.isUpvoted
+            ? post.upvoteCount - 1
+            : post.upvoteCount + 1,
+        })),
+      );
+      return { previousData };
+    },
+
+    onSuccess: (updatedPost) => {
+      const idToSync = updatedPost._id;
+
+      queryClient.setQueriesData({ queryKey: communityKeys.lists() }, (old) =>
+        updatePostInCache(old, idToSync, () => updatedPost),
+      );
+    },
+
+    onError: (_err, _postId, context) => {
+      if (context?.previousData) {
+        queryClient.setQueriesData(
+          { queryKey: communityKeys.lists() },
+          context.previousData,
+        );
+      }
+    },
   });
 };
 
@@ -178,5 +210,29 @@ const useCommunityInvalidation = () => {
       queryClient.invalidateQueries({
         queryKey: communityKeys.comments(postId),
       }),
+  };
+};
+
+/**
+ * Helper to update a specific post within the TanStack InfiniteQuery cache structure
+ */
+const updatePostInCache = (
+  oldData: any,
+  postId: string,
+  updateFn: (post: any) => any,
+) => {
+  if (!oldData?.pages) return oldData;
+
+  return {
+    ...oldData,
+    pages: oldData.pages.map((page: PaginatedResult<any>) => ({
+      ...page,
+      // Safely access 'data' and default to empty array if missing
+      data: (page.data || []).map((post: any) => {
+        // Check both id and _id to be safe across different environments
+        const isMatch = post._id === postId || post.id === postId;
+        return isMatch ? updateFn(post) : post;
+      }),
+    })),
   };
 };
