@@ -82,7 +82,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }, [fetchProfile]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout,  }}>
       {children}
     </AuthContext.Provider>
   );

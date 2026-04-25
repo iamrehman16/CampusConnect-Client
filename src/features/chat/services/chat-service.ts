@@ -29,3 +29,5 @@ export class ChatService {
     return data;
   }
 }
+
+export const chatService = new ChatService();

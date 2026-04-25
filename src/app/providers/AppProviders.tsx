@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
-import QueryProvider from './QueryProvider';
-import ThemeProvider from './ThemeProvider';
-import AuthProvider from './AuthProvider';
+import type { ReactNode } from "react";
+import QueryProvider from "./QueryProvider";
+import ThemeProvider from "./ThemeProvider";
+import AuthProvider from "./AuthProvider";
+import { ChatSocketProvider } from "./ChatSocketProvider";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -19,7 +20,9 @@ export default function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
       <ThemeProvider>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ChatSocketProvider>{children}</ChatSocketProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryProvider>
   );

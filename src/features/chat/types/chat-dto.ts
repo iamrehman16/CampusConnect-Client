@@ -5,6 +5,7 @@ export interface StartConversationDto {
 }
 
 export interface Conversation {
+  id: string;
   participants: string[];
   lastMessage: string;
   lastMessageAt: string;
@@ -12,7 +13,7 @@ export interface Conversation {
   updatedAt: Date;
 }
 
-export interface createMessageDto {
+export interface CreateMessageDto {
   conversationId: string;
   content: string; //max 2000
 }
@@ -27,6 +28,7 @@ export interface GetMessagesParams extends PaginationParams {
 }
 
 export interface Message {
+  id: string;
   conversationId: string;
   sender: string;
   content: string;
@@ -35,4 +37,9 @@ export interface Message {
   isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface MarkSeenDto {
+  conversationId: string;
+  seenBy: string;
 }
