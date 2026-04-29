@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { chatSocketService } from "../services/chat-socket.service";
 import { useChatSocketContext } from "@/shared/hooks/useChatSocketContext";
 import { chatCacheUpdaters } from "../utils/chat-cache.updaters";
-import type { CreateMessageDto, DeleteMessageDto } from "../types/chat-dto";
+import type { CreateMessageDto, Message, DeleteMessageDto } from "../types/chat-dto";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { chatEventHandlers } from "../utils/chatEventHandler";
 
@@ -17,24 +17,9 @@ export function useChatSocket() {
   const currentUserId = user?._id!;
   const cache = useMemo(() => chatCacheUpdaters(queryClient), [queryClient]);
 
-  // Tracks live timers keyed by clientId — cleared on promotion, fired on silence
-  const pendingTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(
-    new Map(),
-  );
+  const pendingTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // ─── Timeout helpers ───────────────────────────────────────────────────────
-
-  const startSendTimeout = useCallback(
-    (clientId: string, conversationId: string) => {
-      const timeout = setTimeout(() => {
-        pendingTimeouts.current.delete(clientId);
-        cache.markFailed(conversationId, clientId);
-      }, SEND_TIMEOUT_MS);
-
-      pendingTimeouts.current.set(clientId, timeout);
-    },
-    [cache],
-  );
 
   const clearSendTimeout = useCallback((clientId: string) => {
     const timeout = pendingTimeouts.current.get(clientId);
@@ -43,6 +28,36 @@ export function useChatSocket() {
       pendingTimeouts.current.delete(clientId);
     }
   }, []);
+
+  const startSendTimeout = useCallback(
+    (clientId: string, conversationId: string) => {
+      clearSendTimeout(clientId); // Clean up existing if retrying
+      const timeout = setTimeout(() => {
+        pendingTimeouts.current.delete(clientId);
+        cache.markFailed(conversationId, clientId);
+      }, SEND_TIMEOUT_MS);
+
+      pendingTimeouts.current.set(clientId, timeout);
+    },
+    [cache, clearSendTimeout],
+  );
+
+  // ─── Shared Emission Logic ────────────────────────────────────────────────
+
+  const performSend = useCallback(
+    (clientId: string, dto: Omit<CreateMessageDto, "clientId">) => {
+      try {
+        chatSocketService.sendMessage({ ...dto, clientId }, (serverMessage: Message) => {
+          clearSendTimeout(clientId);
+          cache.promoteMessage(dto.conversationId, serverMessage);
+        });
+        startSendTimeout(clientId, dto.conversationId);
+      } catch (error) {
+        cache.markFailed(dto.conversationId, clientId);
+      }
+    },
+    [cache, startSendTimeout, clearSendTimeout],
+  );
 
   // ─── Socket listeners ──────────────────────────────────────────────────────
 
@@ -55,17 +70,13 @@ export function useChatSocket() {
       handlers.handleIncomingMessage(message, clearSendTimeout);
     });
 
-    const offMessagesSeen = chatSocketService.onMessagesSeen(
-      ({ conversationId, seenBy }) => {
-        cache.markSeen(conversationId, seenBy);
-      },
-    );
+    const offMessagesSeen = chatSocketService.onMessagesSeen(({ conversationId, seenBy }) => {
+      cache.markSeen(conversationId, seenBy);
+    });
 
-    const offMessageDeleted = chatSocketService.onMessageDeleted(
-      ({ conversationId, messageId }) => {
-        cache.deleteMessage(conversationId, messageId);
-      },
-    );
+    const offMessageDeleted = chatSocketService.onMessageDeleted(({ conversationId, messageId }) => {
+      cache.deleteMessage(conversationId, messageId);
+    });
 
     return () => {
       offNewMessage();
@@ -93,31 +104,18 @@ export function useChatSocket() {
         _status: "PENDING",
       });
 
-      try {
-        chatSocketService.sendMessage({ ...dto, clientId });
-        startSendTimeout(clientId, dto.conversationId);
-      } catch {
-        // Synchronous throw — socket not connected, no point starting timer
-        cache.markFailed(dto.conversationId, clientId);
-      }
-
+      performSend(clientId, dto);
       return clientId;
     },
-    [cache, currentUserId, startSendTimeout],
+    [cache, currentUserId, performSend],
   );
 
   const retryMessage = useCallback(
     (clientId: string, dto: Omit<CreateMessageDto, "clientId">): void => {
       cache.markPending(dto.conversationId, clientId);
-
-      try {
-        chatSocketService.sendMessage({ ...dto, clientId });
-        startSendTimeout(clientId, dto.conversationId);
-      } catch {
-        cache.markFailed(dto.conversationId, clientId);
-      }
+      performSend(clientId, dto);
     },
-    [cache, startSendTimeout],
+    [cache, performSend],
   );
 
   return {
@@ -125,7 +123,6 @@ export function useChatSocket() {
     sendMessage,
     retryMessage,
     markSeen: (id: string) => chatSocketService.markSeen(id),
-    deleteMessage: (dto: DeleteMessageDto) =>
-      chatSocketService.deleteMessage(dto),
+    deleteMessage: (dto: DeleteMessageDto) => chatSocketService.deleteMessage(dto),
   };
 }

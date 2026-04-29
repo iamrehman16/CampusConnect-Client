@@ -52,11 +52,11 @@ class ChatSocketService {
     this.socket.emit("join_conversation", conversationId);
   }
 
-  sendMessage(dto: CreateMessageDto): void {
+  sendMessage(dto: CreateMessageDto, onAck: (message: Message) => void): void {
     if (!this.socket) {
       throw new Error("Socket not connected");
     }
-    this.socket.emit("send_message", dto);
+    this.socket.emit("send_message", dto, onAck);
   }
 
   markSeen(conversationId: string): void {
