@@ -4,7 +4,6 @@ import type { Message } from "../types/chat-dto";
 import { chatKeys } from "../hooks/chat-keys";
 
 export const chatCacheUpdaters = (queryClient: any) => ({
-
   // Optimistic append — called immediately on send, before server reply
   appendOptimistic(message: Message) {
     queryClient.setQueryData(
@@ -114,6 +113,41 @@ export const chatCacheUpdaters = (queryClient: any) => ({
             ...page,
             data: page.data.map((msg) =>
               msg.id === messageId ? { ...msg, isDeleted: true } : msg,
+            ),
+          })),
+        };
+      },
+    );
+  },
+
+  isOwnReplica(conversationId: string, clientId?: string) {
+    if (!clientId) return false;
+
+    const cacheData = queryClient.getQueryData(
+      chatKeys.messages(conversationId),
+    ) as InfiniteData<PaginatedResult<Message>> | undefined;
+
+    return (
+      cacheData?.pages?.some((page) =>
+        page.data.some((msg) => msg.clientId === clientId),
+      ) ?? false
+    );
+  },
+
+  markPending(conversationId: string, clientId: string) {
+    queryClient.setQueryData(
+      chatKeys.messages(conversationId),
+      (old: InfiniteData<PaginatedResult<Message>> | undefined) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            data: page.data.map((msg) =>
+              msg.clientId === clientId
+                ? { ...msg, _status: "PENDING" as const }
+                : msg,
             ),
           })),
         };

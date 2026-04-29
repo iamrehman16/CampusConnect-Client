@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import { chatSocketService } from "../services/chat-socket.service";
 import { useChatSocketContext } from "@/shared/hooks/useChatSocketContext";
 import { chatCacheUpdaters } from "../utils/chat-cache.updaters";
-import { chatKeys } from "./chat-keys";
 import type { CreateMessageDto, DeleteMessageDto } from "../types/chat-dto";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { chatEventHandlers } from "../utils/chatEventHandler";
@@ -109,24 +108,7 @@ export function useChatSocket() {
 
   const retryMessage = useCallback(
     (clientId: string, dto: Omit<CreateMessageDto, "clientId">): void => {
-      // Flip existing message back to PENDING in place
-      queryClient.setQueryData(
-        chatKeys.messages(dto.conversationId),
-        (old: any) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page: any) => ({
-              ...page,
-              data: page.data.map((msg: any) =>
-                msg.clientId === clientId
-                  ? { ...msg, _status: "PENDING" as const }
-                  : msg,
-              ),
-            })),
-          };
-        },
-      );
+      cache.markPending(dto.conversationId, clientId);
 
       try {
         chatSocketService.sendMessage({ ...dto, clientId });
@@ -135,7 +117,7 @@ export function useChatSocket() {
         cache.markFailed(dto.conversationId, clientId);
       }
     },
-    [cache, queryClient, startSendTimeout],
+    [cache, startSendTimeout],
   );
 
   return {

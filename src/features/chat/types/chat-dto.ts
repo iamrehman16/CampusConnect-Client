@@ -4,10 +4,16 @@ export interface StartConversationDto {
   participantId: string;
 }
 
+export interface ConversationParticipant {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Conversation {
   id: string;
-  participants: string[];
-  lastMessage: string;
+  participants: ConversationParticipant[];
+  lastMessage: Message | null;
   lastMessageAt: string;
   createdAt: Date;
   updatedAt: Date;

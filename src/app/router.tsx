@@ -1,27 +1,48 @@
-import { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { ROUTES } from '@/shared/constants/routes';
-import ProtectedRoute from '@/app/routes/ProtectedRoute';
-import PublicRoute from '@/app/routes/PublicRoute';
-import RoleRoute from '@/app/routes/RoleRoute';
-import AppLayout from '@/shared/components/layout/AppLayout';
-import LoadingScreen from '@/shared/components/feedback/LoadingScreen';
-import { UserRole } from '@/shared/types/enums';
+import { lazy, Suspense } from "react";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { ROUTES } from "@/shared/constants/routes";
+import ProtectedRoute from "@/app/routes/ProtectedRoute";
+import PublicRoute from "@/app/routes/PublicRoute";
+import RoleRoute from "@/app/routes/RoleRoute";
+import AppLayout from "@/shared/components/layout/AppLayout";
+import LoadingScreen from "@/shared/components/feedback/LoadingScreen";
+import { UserRole } from "@/shared/types/enums";
 
 // ── Eager-loaded (first paint) ──────────────────────────────────────
-import AuthPage from '@/features/auth/pages/AuthPage';
-import DashboardPage from '@/features/dashboard/pages/DashboardPage';
+import AuthPage from "@/features/auth/pages/AuthPage";
+import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 
 // ── Lazy-loaded (code-split) ────────────────────────────────────────
-const ResourcePage = lazy(() => import('@/features/resources/pages/ResourcePage'));
-const ResourceDetailPage = lazy(() => import('@/features/resources/pages/ResourceDetailPage'));
-const AiChatPage = lazy(() => import('@/features/ai-chat/pages/AiChatPage'));
-const ChatPage = lazy(() => import('@/features/chat/pages/ChatPage'));
-const CommunityPage = lazy(() => import('@/features/community/pages/CommunityPage'));
-const ProfilePage = lazy(() => import('@/features/user/pages/ProfilePage'));
-const PublicProfilePage = lazy(()=> import('@/features/user/pages/PublicProfilePage'))
+const ResourcePage = lazy(
+  () => import("@/features/resources/pages/ResourcePage"),
+);
+const ResourceDetailPage = lazy(
+  () => import("@/features/resources/pages/ResourceDetailPage"),
+);
+const AiChatPage = lazy(() => import("@/features/ai-chat/pages/AiChatPage"));
+const ConversationsPage = lazy(
+  () => import("@/features/chat/pages/ConversationsPage"),
+);
+
+const ConversationPage = lazy(
+  () => import("@/features/chat/pages/ConversationPage"),
+);
+
+const ChatEmptyState = lazy(
+  () => import("@/features/chat/components/ChatEmptyState"),
+);
+
+const CommunityPage = lazy(
+  () => import("@/features/community/pages/CommunityPage"),
+);
+const ProfilePage = lazy(() => import("@/features/user/pages/ProfilePage"));
+const PublicProfilePage = lazy(
+  () => import("@/features/user/pages/PublicProfilePage"),
+);
 // Admin pages — completely isolated bundle
-const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
+const AdminDashboardPage = lazy(
+  () => import("@/features/admin/pages/AdminDashboardPage"),
+);
 
 /**
  * Wraps a lazy component with Suspense fallback.
@@ -87,13 +108,28 @@ const router = createBrowserRouter([
           },
 
           // Real-time Chat
+          // Real-time Chat
           {
             path: ROUTES.CHAT,
             element: (
               <SuspenseWrapper>
-                <ChatPage />
+                <ConversationsPage />
               </SuspenseWrapper>
             ),
+            children: [
+              {
+                index: true,
+                element: <ChatEmptyState />,
+              },
+              {
+                path: ":conversationId",
+                element: (
+                  <SuspenseWrapper>
+                    <ConversationPage />
+                  </SuspenseWrapper>
+                ),
+              },
+            ],
           },
 
           // Community
@@ -125,7 +161,6 @@ const router = createBrowserRouter([
             ),
           },
 
-
           // ── Admin routes (role-gated) ─────────────────────────
           {
             element: <RoleRoute allowedRoles={[UserRole.ADMIN]} />,
@@ -147,7 +182,7 @@ const router = createBrowserRouter([
 
   // ── Catch-all redirect ────────────────────────────────────────
   {
-    path: '*',
+    path: "*",
     element: <Navigate to={ROUTES.HOME} replace />,
   },
 ]);
