@@ -7,6 +7,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
+import { Navigate } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useChatSocket } from "../hooks/chat-socket-hooks";
@@ -14,9 +15,16 @@ import { useConversationsQuery, useMessagesQuery } from "../hooks/chat-hooks";
 import { MessageFeed } from "../components/MessageFeed";
 import { MessageInput } from "../components/MessageInput";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { useEffect } from "react";
+import { useChatUIStore } from "../store/chat-ui.store";
+import { ROUTES } from "@/shared/constants/routes";
 
 export default function ConversationPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
+  const activeConversationId =
+    conversationId && conversationId !== "undefined"
+      ? conversationId
+      : undefined;
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -25,14 +33,29 @@ export default function ConversationPage() {
   const { sendMessage, retryMessage, markSeen } = useChatSocket();
 
   const { data: conversations } = useConversationsQuery();
-  const conversation = conversations?.find((c) => c.id === conversationId);
+  const conversation = conversations?.find((c) => c.id === activeConversationId);
   const otherParticipant = conversation?.participants.find(
     (p) => p.id !== user?._id,
   );
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMessagesQuery(conversationId!);
+    useMessagesQuery(activeConversationId ?? "");
   const messages = data?.pages.flatMap((p) => p.data) ?? [];
+
+  const { setActiveConversationId, clearUnread } = useChatUIStore();
+
+  useEffect(() => {
+    if (!activeConversationId) return;
+
+    setActiveConversationId(activeConversationId);
+    clearUnread(activeConversationId);
+
+    return () => setActiveConversationId(null); // cleanup on unmount
+  }, [activeConversationId, setActiveConversationId, clearUnread]);
+
+  if (!activeConversationId) {
+    return <Navigate to={ROUTES.CHAT} replace />;
+  }
 
   // Cold cache — user navigated directly via URL before conversation list loaded
   if (!conversation) {
@@ -90,7 +113,7 @@ export default function ConversationPage() {
           fetchNextPage={fetchNextPage}
           hasNextPage={!!hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
-          onVisible={() => markSeen(conversationId!)}
+          onVisible={() => markSeen(activeConversationId)}
         />
       </Box>
 
@@ -99,7 +122,7 @@ export default function ConversationPage() {
       {/* Input */}
       <Box sx={{ flexShrink: 0 }}>
         <MessageInput
-          conversationId={conversationId!}
+          conversationId={activeConversationId}
           sendMessage={sendMessage}
         />
       </Box>

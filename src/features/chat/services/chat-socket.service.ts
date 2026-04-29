@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { config } from "@/shared/constants/config";
 import type {
   CreateMessageDto,
   DeleteMessageDto,
@@ -13,17 +14,28 @@ class ChatSocketService {
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
 
-  connect(token: string): void {
-    if (this.socket?.connected) return;
+  connect(token: string): Socket {
+    if (this.socket) {
+      this.socket.auth = { token };
 
-    this.socket = io(`${import.meta.env.VITE_API_BASE_URL}/chat`, {
+      if (!this.socket.connected) {
+        this.socket.connect();
+      }
+
+      return this.socket;
+    }
+
+    this.socket = io(`${config.socketUrl}/chat`, {
       auth: { token },
-      transports: ["websocket"],
+      transports: ["polling", "websocket"],
+      reconnection: true,
     });
 
     this.socket.on("connect_error", (err) => {
       console.error("[ChatSocket] connection error:", err.message);
     });
+
+    return this.socket;
   }
 
   disconnect(): void {

@@ -10,7 +10,7 @@ import { UserService } from "./user.services";
 
 export class AdminUserService extends UserService {
   async getUsers(params: UserFilterParams): Promise<PaginatedResult<User>> {
-    const { data } = await api.get<PaginatedResult<User>>("admin/users", {
+    const { data } = await api.get<PaginatedResult<User>>("/users", {
       params,
     });
 

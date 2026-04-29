@@ -18,6 +18,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { ROUTES } from '@/shared/constants/routes';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { UserRole } from '@/shared/types/enums';
+import { People } from '@mui/icons-material';
 
 export const SIDEBAR_WIDTH = 260;
 
@@ -26,6 +27,7 @@ const MAIN_NAV = [
   { label: 'Resources', icon: <LibraryBooksIcon />, path: ROUTES.RESOURCES },
   { label: 'AI Assistant', icon: <SmartToyIcon />, path: ROUTES.AI_CHAT },
   { label: 'Messages', icon: <ChatIcon />, path: ROUTES.CHAT },
+  { label: 'Contributors', icon: <People />, path: ROUTES.CONTRIBUTORS },
   { label: 'Community', icon: <ForumIcon />, path: ROUTES.COMMUNITY },
 ];
 

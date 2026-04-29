@@ -6,6 +6,9 @@ import {
 } from "@tanstack/react-query";
 import { chatService } from "../services/chat-service";
 import { chatKeys } from "./chat-keys";
+import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
+import { ROUTES } from "@/shared/constants/routes";
 
 export function useConversationsQuery() {
   return useQuery({
@@ -38,4 +41,19 @@ export function useFindOrCreateConversation() {
       queryClient.invalidateQueries({ queryKey: chatKeys.conversations() });
     },
   });
+}
+
+export function useChatTrigger() {
+  const navigate = useNavigate();
+  const { mutateAsync, isPending } = useFindOrCreateConversation();
+
+  const trigger = useCallback(
+    async (participantId: string) => {
+      const conversation = await mutateAsync({ participantId });
+      navigate(`${ROUTES.CHAT}/${conversation.id}`);
+    },
+    [mutateAsync, navigate],
+  );
+
+  return { trigger, isPending };
 }

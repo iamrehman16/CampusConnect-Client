@@ -35,6 +35,11 @@ const ChatEmptyState = lazy(
 const CommunityPage = lazy(
   () => import("@/features/community/pages/CommunityPage"),
 );
+
+const ContributorsPage = lazy(
+  () => import("@/features/contributors/pages/ContributorsPage"),
+);
+
 const ProfilePage = lazy(() => import("@/features/user/pages/ProfilePage"));
 const PublicProfilePage = lazy(
   () => import("@/features/user/pages/PublicProfilePage"),
@@ -157,6 +162,15 @@ const router = createBrowserRouter([
             element: (
               <SuspenseWrapper>
                 <PublicProfilePage />
+              </SuspenseWrapper>
+            ),
+          },
+
+          {
+            path: ROUTES.CONTRIBUTORS,
+            element: (
+              <SuspenseWrapper>
+                <ContributorsPage />
               </SuspenseWrapper>
             ),
           },
