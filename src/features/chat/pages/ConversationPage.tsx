@@ -18,6 +18,7 @@ import { useAuth } from "@/shared/hooks/useAuth";
 import { useEffect } from "react";
 import { useChatUIStore } from "../store/chat-ui.store";
 import { ROUTES } from "@/shared/constants/routes";
+import { useChatSocketContext } from "@/shared/hooks/useChatSocketContext";
 
 export default function ConversationPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -30,17 +31,30 @@ export default function ConversationPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const { user } = useAuth();
-  const { sendMessage, retryMessage, markSeen } = useChatSocket();
+  const isConnected = useChatSocketContext();
+  const { sendMessage, retryMessage, markSeen, joinConversation } =
+    useChatSocket();
+
+  useEffect(() => {
+    if (!activeConversationId || !isConnected) return;
+    joinConversation(activeConversationId);
+  }, [activeConversationId, isConnected]);
 
   const { data: conversations } = useConversationsQuery();
-  const conversation = conversations?.find((c) => c.id === activeConversationId);
+  const conversation = conversations?.find(
+    (c) => c.id === activeConversationId,
+  );
   const otherParticipant = conversation?.participants.find(
     (p) => p.id !== user?._id,
   );
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useMessagesQuery(activeConversationId ?? "");
-  const messages = data?.pages.flatMap((p) => p.data) ?? [];
+  const messages =
+    data?.pages
+      .slice()
+      .reverse()
+      .flatMap((p) => [...p.data].reverse()) ?? [];
 
   const { setActiveConversationId, clearUnread } = useChatUIStore();
 
