@@ -25,6 +25,9 @@ function normalizeMessage(message: RawMessage): Message {
   return {
     ...message,
     id: message.id ?? message._id ?? "",
+    seenAt: message.seenAt ? new Date(message.seenAt) : null,
+    createdAt: new Date(message.createdAt),
+    updatedAt: new Date(message.updatedAt),
   };
 }
 

@@ -7,11 +7,18 @@ import { format } from "date-fns";
 interface Props {
   message: Message;
   retryMessage: (clientId: string, dto: { conversationId: string; content: string }) => void;
+  showSeenAt?: boolean;
 }
 
-export function MessageBubble({ message, retryMessage }: Props) {
+export function MessageBubble({
+  message,
+  retryMessage,
+  showSeenAt = false,
+}: Props) {
   const { user } = useAuth();
   const isOwn = message.sender === user?._id;
+  const timestampColor = isOwn ? "rgba(255,255,255,0.78)" : "text.disabled";
+  const seenAt = message.seenAt ? format(new Date(message.seenAt), "HH:mm") : null;
 
   return (
     <Box
@@ -44,25 +51,39 @@ export function MessageBubble({ message, retryMessage }: Props) {
         ) : (
           <Typography variant="body2">{message.content}</Typography>
         )}
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 0.5,
+            mt: 0.5,
+            minHeight: 14,
+          }}
+        >
+          {message.createdAt && (
+            <Typography variant="caption" sx={{ color: timestampColor, lineHeight: 1 }}>
+              {format(new Date(message.createdAt), "HH:mm")}
+            </Typography>
+          )}
+          {isOwn && (
+            <MessageStatusIcon
+              status={message._status}
+              clientId={message.clientId}
+              conversationId={message.conversationId}
+              content={message.content}
+              retryMessage={retryMessage}
+            />
+          )}
+        </Box>
       </Box>
 
-      {/* Timestamp + status row */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.25, px: 0.5 }}>
-        {message.createdAt && message._status !== "PENDING" && (
-          <Typography variant="caption" color="text.disabled">
-            {format(new Date(message.createdAt), "HH:mm")}
-          </Typography>
-        )}
-        {isOwn && (
-          <MessageStatusIcon
-            status={message._status}
-            clientId={message.clientId}
-            conversationId={message.conversationId}
-            content={message.content}
-            retryMessage={retryMessage}
-          />
-        )}
-      </Box>
+      {isOwn && showSeenAt && seenAt && (
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, px: 0.5 }}>
+          Seen at {seenAt}
+        </Typography>
+      )}
     </Box>
   );
 }

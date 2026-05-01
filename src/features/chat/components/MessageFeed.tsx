@@ -9,7 +9,7 @@ interface Props {
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
-  onVisible: () => void;
+  currentUserId?: string;
 }
 
 export function MessageFeed({
@@ -18,10 +18,13 @@ export function MessageFeed({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-  onVisible,
+  currentUserId,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const latestSeenOwnMessageKey = [...messages]
+    .reverse()
+    .find((message) => message.sender === currentUserId && message.seenAt);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -42,11 +45,6 @@ export function MessageFeed({
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  // Mark seen when feed is visible
-  useEffect(() => {
-    onVisible();
-  }, [onVisible]);
 
   return (
     <Box
@@ -83,6 +81,10 @@ export function MessageFeed({
           key={message.clientId || message.id}
           message={message}
           retryMessage={retryMessage}
+          showSeenAt={
+            (message.id || message.clientId) ===
+            (latestSeenOwnMessageKey?.id || latestSeenOwnMessageKey?.clientId)
+          }
         />
       ))}
 

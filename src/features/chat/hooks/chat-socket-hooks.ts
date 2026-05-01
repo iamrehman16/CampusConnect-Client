@@ -7,6 +7,7 @@ import { chatCacheUpdaters } from "../utils/chat-cache.updaters";
 import type { CreateMessageDto, Message, DeleteMessageDto } from "../types/chat-dto";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { chatEventHandlers } from "../utils/chatEventHandler";
+import { useChatUIStore } from "../store/chat-ui.store";
 
 const SEND_TIMEOUT_MS = 6000;
 
@@ -68,6 +69,14 @@ export function useChatSocket() {
 
     const offNewMessage = chatSocketService.onNewMessage((message) => {
       handlers.handleIncomingMessage(message, clearSendTimeout);
+
+      const { activeConversationId } = useChatUIStore.getState();
+      if (
+        message.sender !== currentUserId &&
+        message.conversationId === activeConversationId
+      ) {
+        chatSocketService.markSeen(message.conversationId);
+      }
     });
 
     const offMessagesSeen = chatSocketService.onMessagesSeen(({ conversationId, seenBy }) => {
@@ -83,7 +92,7 @@ export function useChatSocket() {
       offMessagesSeen();
       offMessageDeleted();
     };
-  }, [isConnected, handlers, cache, clearSendTimeout]);
+  }, [isConnected, handlers, cache, clearSendTimeout, currentUserId]);
 
   // ─── Emitters ──────────────────────────────────────────────────────────────
 
@@ -118,11 +127,26 @@ export function useChatSocket() {
     [cache, performSend],
   );
 
+  const joinConversation = useCallback(
+    (id: string) => chatSocketService.joinConversation(id),
+    [],
+  );
+
+  const markSeen = useCallback(
+    (id: string) => chatSocketService.markSeen(id),
+    [],
+  );
+
+  const deleteMessage = useCallback(
+    (dto: DeleteMessageDto) => chatSocketService.deleteMessage(dto),
+    [],
+  );
+
   return {
-    joinConversation: (id: string) => chatSocketService.joinConversation(id),
+    joinConversation,
     sendMessage,
     retryMessage,
-    markSeen: (id: string) => chatSocketService.markSeen(id),
-    deleteMessage: (dto: DeleteMessageDto) => chatSocketService.deleteMessage(dto),
+    markSeen,
+    deleteMessage,
   };
 }

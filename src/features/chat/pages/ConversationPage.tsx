@@ -15,7 +15,7 @@ import { useConversationsQuery, useMessagesQuery } from "../hooks/chat-hooks";
 import { MessageFeed } from "../components/MessageFeed";
 import { MessageInput } from "../components/MessageInput";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useChatUIStore } from "../store/chat-ui.store";
 import { ROUTES } from "@/shared/constants/routes";
 import { useChatSocketContext } from "@/shared/hooks/useChatSocketContext";
@@ -31,14 +31,14 @@ export default function ConversationPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const { user } = useAuth();
-  const isConnected = useChatSocketContext();
+  const { isConnected } = useChatSocketContext();
   const { sendMessage, retryMessage, markSeen, joinConversation } =
     useChatSocket();
 
   useEffect(() => {
     if (!activeConversationId || !isConnected) return;
     joinConversation(activeConversationId);
-  }, [activeConversationId, isConnected]);
+  }, [activeConversationId, isConnected, joinConversation]);
 
   const { data: conversations } = useConversationsQuery();
   const conversation = conversations?.find(
@@ -55,6 +55,10 @@ export default function ConversationPage() {
       .slice()
       .reverse()
       .flatMap((p) => [...p.data].reverse()) ?? [];
+  const latestMessage = useMemo(
+    () => messages[messages.length - 1],
+    [messages],
+  );
 
   const { setActiveConversationId, clearUnread } = useChatUIStore();
 
@@ -66,6 +70,13 @@ export default function ConversationPage() {
 
     return () => setActiveConversationId(null); // cleanup on unmount
   }, [activeConversationId, setActiveConversationId, clearUnread]);
+
+  useEffect(() => {
+    if (!activeConversationId || !latestMessage) return;
+    if (latestMessage.sender === user?._id || latestMessage.seenAt) return;
+
+    markSeen(activeConversationId);
+  }, [activeConversationId, latestMessage, markSeen, user?._id]);
 
   if (!activeConversationId) {
     return <Navigate to={ROUTES.CHAT} replace />;
@@ -127,7 +138,7 @@ export default function ConversationPage() {
           fetchNextPage={fetchNextPage}
           hasNextPage={!!hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
-          onVisible={() => markSeen(activeConversationId)}
+          currentUserId={user?._id}
         />
       </Box>
 
