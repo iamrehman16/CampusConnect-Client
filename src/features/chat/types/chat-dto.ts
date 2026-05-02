@@ -32,6 +32,7 @@ export interface DeleteMessageDto {
 
 export interface GetMessagesParams extends PaginationParams {
   conversationId: string;
+  before?:string;
 }
 
 export interface Message {

@@ -7,7 +7,7 @@ import {
 import { chatService } from "../services/chat-service";
 import { chatKeys } from "./chat-keys";
 import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { ROUTES } from "@/shared/constants/routes";
 
 export function useConversationsQuery() {
@@ -19,15 +19,25 @@ export function useConversationsQuery() {
 }
 
 export function useMessagesQuery(conversationId: string) {
+  // Anchor timestamp — set once on mount, never changes for this hook instance
+  const beforeRef = useRef(new Date().toISOString());
+
   return useInfiniteQuery({
     queryKey: chatKeys.messages(conversationId),
     queryFn: ({ pageParam = 1 }) =>
-      chatService.getMessages({ conversationId, page: pageParam, limit: 20 }),
+      chatService.getMessages({
+        conversationId,
+        page: pageParam,
+        limit: 20,
+        before: beforeRef.current, // anchor all pages to same point in time
+      }),
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPage ? lastPage.page + 1 : undefined,
     initialPageParam: 1,
     enabled: !!conversationId,
-    staleTime: 1000 * 60,
+    maxPages:3,
+    staleTime: 0,
+    refetchOnMount:true,
   });
 }
 
