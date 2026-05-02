@@ -97,7 +97,7 @@ export default function LoginForm() {
         fullWidth
         size="large"
         disabled={loginMutation.isPending}
-        sx={{ mt: 3, py: 1.5 }}
+        sx={{ mt: 3, minHeight: 48 }}
       >
         {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
       </Button>

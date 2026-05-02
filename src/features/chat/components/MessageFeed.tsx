@@ -57,6 +57,7 @@ export function MessageFeed({
         px: 2,
         py: 1,
         gap: 0.5,
+        bgcolor: "background.default",
       }}
     >
       {isFetchingNextPage && (

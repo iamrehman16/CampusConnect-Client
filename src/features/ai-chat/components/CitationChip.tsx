@@ -22,12 +22,13 @@ export function CitationsChip({ citations }: CitationsChipProps) {
         sx={{
           fontSize: '0.7rem',
           fontWeight: 600,
-          color: 'primary.light',
-          bgcolor: 'rgba(108, 99, 255, 0.10)',
-          border: '1px solid rgba(108, 99, 255, 0.20)',
+          color: 'primary.main',
+          bgcolor: 'action.selected',
+          border: '1px solid',
+          borderColor: 'primary.light',
           borderRadius: '6px',
           cursor: 'pointer',
-          '&:hover': { bgcolor: 'rgba(108, 99, 255, 0.16)' },
+          '&:hover': { bgcolor: 'action.focus' },
         }}
       />
       <Collapse in={open}>
@@ -60,18 +61,19 @@ function CitationItem({ citation, index }: CitationItemProps) {
         display: 'flex',
         alignItems: 'flex-start',
         gap: 1,
-        bgcolor: 'rgba(108, 99, 255, 0.06)',
-        border: '1px solid rgba(108, 99, 255, 0.12)',
+        bgcolor: 'action.hover',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: '8px',
         p: '7px 10px',
         cursor: 'pointer',
         transition: 'background-color 0.15s, border-color 0.15s',
         '&:hover': {
-          bgcolor: 'rgba(108, 99, 255, 0.12)',
-          borderColor: 'rgba(108, 99, 255, 0.25)',
+          bgcolor: 'action.selected',
+          borderColor: 'primary.light',
         },
         '&:active': {
-          bgcolor: 'rgba(108, 99, 255, 0.18)',
+          bgcolor: 'action.focus',
         },
       }}
     >
@@ -80,7 +82,7 @@ function CitationItem({ citation, index }: CitationItemProps) {
           minWidth: 20,
           height: 20,
           borderRadius: '4px',
-          bgcolor: 'rgba(108, 99, 255, 0.18)',
+          bgcolor: 'action.selected',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -88,7 +90,7 @@ function CitationItem({ citation, index }: CitationItemProps) {
           flexShrink: 0,
         }}
       >
-        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'primary.light' }}>
+        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'primary.main' }}>
           {index}
         </Typography>
       </Box>
@@ -100,7 +102,7 @@ function CitationItem({ citation, index }: CitationItemProps) {
           {citation.course} · Sem {citation.semester} · Page.{citation.pageNumber}
         </Typography>
       </Box>
-      <OpenInNewIcon sx={{ fontSize: 13, color: 'primary.light', opacity: 0.6, mt: '3px', flexShrink: 0 }} />
+      <OpenInNewIcon sx={{ fontSize: 13, color: 'primary.main', opacity: 0.6, mt: '3px', flexShrink: 0 }} />
     </Box>
   );
 }

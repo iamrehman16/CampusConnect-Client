@@ -33,13 +33,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             borderBottomLeftRadius: isUser ? '14px' : '4px',
             ...(isUser
               ? {
-                  background: 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)',
-                  color: '#fff',
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
                 }
               : {
-                  bgcolor: 'background.paper',
-                  border: '1px solid',
-                  borderColor: 'divider',
+                  border: { xs: '1px solid', md: 'none' },
+                  borderColor: { xs: 'divider', md: 'transparent' },
+                  bgcolor: { xs: 'background.paper', md: 'transparent' },
+                  px: { xs: 1.75, md: 0 },
+                  py: { xs: 1.25, md: 0.5 },
                   color: 'text.primary',
                 }),
             fontSize: '0.875rem',

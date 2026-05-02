@@ -15,6 +15,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import PersonIcon from '@mui/icons-material/Person';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { alpha } from '@mui/material/styles';
 import { ROUTES } from '@/shared/constants/routes';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { UserRole } from '@/shared/types/enums';
@@ -60,22 +61,21 @@ export default function Sidebar() {
           width: SIDEBAR_WIDTH,
           boxSizing: 'border-box',
           bgcolor: 'background.paper',
+          borderRight: '1px solid',
+          borderColor: 'divider',
           display: 'flex',
           flexDirection: 'column',
         },
       }}
     >
       {/* Logo / Brand */}
-      <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, height: 64 }}>
         <SmartToyIcon sx={{ color: 'primary.main', fontSize: 28 }} />
         <Typography
           variant="h6"
           sx={{
             fontWeight: 700,
-            background: 'linear-gradient(135deg, #6C63FF 0%, #00D9A6 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'primary.main',
           }}
         >
           CampusChamp
@@ -85,20 +85,25 @@ export default function Sidebar() {
       <Divider />
 
       {/* Main Navigation */}
-      <List sx={{ flex: 1, px: 1, py: 1 }}>
+      <List sx={{ flex: 1, px: 1.5, py: 1 }}>
         {MAIN_NAV.map((item) => (
           <ListItemButton
             key={item.label}
             selected={isActive(item.path)}
             onClick={() => navigate(item.path)}
             sx={{
-              borderRadius: 2,
+              borderRadius: 1.5,
               mb: 0.5,
+              minHeight: 44,
+              borderLeft: (theme) => (isActive(item.path) ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent'),
+              pl: isActive(item.path) ? 1.625 : 2.5,
               '&.Mui-selected': {
                 bgcolor: 'action.selected',
                 '& .MuiListItemIcon-root': { color: 'primary.main' },
-                '& .MuiListItemText-primary': { fontWeight: 600 },
+                '& .MuiListItemText-primary': { fontWeight: 700 },
               },
+              '& .MuiListItemIcon-root': { color: isActive(item.path) ? 'primary.main' : 'text.secondary' },
+              '& .MuiListItemText-primary': { fontWeight: isActive(item.path) ? 700 : 500 },
             }}
           >
             <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
@@ -114,13 +119,18 @@ export default function Sidebar() {
               selected={isActive(ROUTES.ADMIN)}
               onClick={() => navigate(ROUTES.ADMIN)}
               sx={{
-                borderRadius: 2,
+                borderRadius: 1.5,
                 mb: 0.5,
+                minHeight: 44,
+                borderLeft: (theme) => (isActive(ROUTES.ADMIN) ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent'),
+                pl: isActive(ROUTES.ADMIN) ? 1.625 : 2.5,
                 '&.Mui-selected': {
                   bgcolor: 'action.selected',
                   '& .MuiListItemIcon-root': { color: 'primary.main' },
-                  '& .MuiListItemText-primary': { fontWeight: 600 },
+                  '& .MuiListItemText-primary': { fontWeight: 700 },
                 },
+                '& .MuiListItemIcon-root': { color: isActive(ROUTES.ADMIN) ? 'primary.main' : 'text.secondary' },
+                '& .MuiListItemText-primary': { fontWeight: isActive(ROUTES.ADMIN) ? 700 : 500 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 40 }}>
@@ -135,13 +145,26 @@ export default function Sidebar() {
       <Divider />
 
       {/* Bottom actions */}
-      <List sx={{ px: 1, py: 1 }}>
+      <List sx={{ px: 1.5, py: 1 }}>
         {BOTTOM_NAV.map((item) => (
           <ListItemButton
             key={item.label}
             selected={isActive(item.path)}
             onClick={() => navigate(item.path)}
-            sx={{ borderRadius: 2, mb: 0.5 }}
+            sx={{
+              borderRadius: 1.5,
+              mb: 0.5,
+              minHeight: 44,
+              borderLeft: (theme) => (isActive(item.path) ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent'),
+              pl: isActive(item.path) ? 1.625 : 2.5,
+              '&.Mui-selected': {
+                bgcolor: 'action.selected',
+                '& .MuiListItemIcon-root': { color: 'primary.main' },
+                '& .MuiListItemText-primary': { fontWeight: 700 },
+              },
+              '& .MuiListItemIcon-root': { color: isActive(item.path) ? 'primary.main' : 'text.secondary' },
+              '& .MuiListItemText-primary': { fontWeight: isActive(item.path) ? 700 : 500 },
+            }}
           >
             <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
             <ListItemText primary={item.label} />
@@ -150,8 +173,9 @@ export default function Sidebar() {
         <ListItemButton
           onClick={logout}
           sx={{
-            borderRadius: 2,
-            '&:hover': { bgcolor: 'rgba(255, 107, 107, 0.08)' },
+            borderRadius: 1.5,
+            minHeight: 44,
+            '&:hover': (theme) => ({ bgcolor: alpha(theme.palette.error.main, 0.08) }),
           }}
         >
           <ListItemIcon sx={{ minWidth: 40 }}>

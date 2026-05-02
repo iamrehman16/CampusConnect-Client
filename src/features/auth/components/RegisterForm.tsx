@@ -138,7 +138,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         fullWidth
         size="large"
         disabled={registerMutation.isPending}
-        sx={{ mt: 3, py: 1.5 }}
+        sx={{ mt: 3, minHeight: 48 }}
       >
         {registerMutation.isPending ? 'Creating account...' : 'Create Account'}
       </Button>

@@ -30,18 +30,18 @@ export default function AuthPage() {
         justifyContent: 'center',
         px: 2,
         py: 4,
-        background:
-          'radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.08) 0%, transparent 50%), ' +
-          'radial-gradient(ellipse at 80% 50%, rgba(0, 217, 166, 0.06) 0%, transparent 50%)',
+        bgcolor: 'background.default',
       }}
     >
       <Card
         sx={{
           width: '100%',
           maxWidth: 440,
-          border: '1px solid rgba(148, 163, 184, 0.1)',
-          bgcolor: 'rgba(17, 24, 39, 0.8)',
-          backdropFilter: 'blur(20px)',
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 3,
+          boxShadow: 'none',
         }}
       >
         <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
@@ -60,11 +60,7 @@ export default function AuthPage() {
               variant="h4"
               sx={{
                 fontWeight: 700,
-                background:
-                  'linear-gradient(135deg, #6C63FF 0%, #00D9A6 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'primary.main',
               }}
             >
               AcademiQ
@@ -85,9 +81,10 @@ export default function AuthPage() {
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
             variant="fullWidth"
+            indicatorColor="primary"
+            textColor="primary"
             sx={{
               mb: 3,
-              '& .MuiTab-root': { borderRadius: 2 },
             }}
           >
             <Tab label="Sign In" id="auth-tab-0" />

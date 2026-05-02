@@ -215,10 +215,10 @@ export default function ResourceDetailPage() {
                 sx={{ fontSize: '0.75rem' }}
               />
               {resource.approvalStatus === ApprovalStatus.PENDING && (
-                <Chip label="Pending Review" size="small" color="warning" sx={{ fontSize: '0.75rem' }} />
+                <Chip label="Pending Review" size="small" color="warning" variant="outlined" sx={{ fontSize: '0.75rem' }} />
               )}
               {resource.approvalStatus === ApprovalStatus.REJECTED && (
-                <Chip label="Rejected" size="small" color="error" sx={{ fontSize: '0.75rem' }} />
+                <Chip label="Rejected" size="small" color="error" variant="outlined" sx={{ fontSize: '0.75rem' }} />
               )}
             </Stack>
 
@@ -246,7 +246,7 @@ export default function ResourceDetailPage() {
             bgcolor: 'background.paper',
           }}
         >
-          <Typography variant="subtitle2" fontWeight={700} mb={1} color="text.secondary">
+          <Typography variant="overline" color="text.secondary" fontWeight={700} mb={1}>
             DESCRIPTION
           </Typography>
           <Typography variant="body2" sx={{ lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
@@ -267,7 +267,7 @@ export default function ResourceDetailPage() {
           bgcolor: 'background.paper',
         }}
       >
-        <Typography variant="subtitle2" fontWeight={700} mb={2} color="text.secondary">
+        <Typography variant="overline" color="text.secondary" fontWeight={700} mb={2}>
           DETAILS
         </Typography>
 
@@ -350,7 +350,7 @@ export default function ResourceDetailPage() {
             bgcolor: 'rgba(211,47,47,0.08)',
           }}
         >
-          <Typography variant="caption" color="error.light" fontWeight={700} display="block" mb={0.5}>
+          <Typography variant="overline" color="error.light" fontWeight={700} display="block" mb={0.5}>
             REJECTION REASON
           </Typography>
           <Typography variant="body2" color="error.light">
@@ -368,7 +368,7 @@ export default function ResourceDetailPage() {
           startIcon={<DownloadIcon />}
           onClick={handleDownload}
           disabled={downloading}
-          sx={{ borderRadius: 2, py: 1.5 }}
+          sx={{ borderRadius: 2, minHeight: 48 }}
         >
           {downloading ? 'Preparing download...' : 'Download Resource'}
         </Button>

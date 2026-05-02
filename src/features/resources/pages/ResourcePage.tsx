@@ -51,7 +51,7 @@ function ResourceCardSkeleton() {
   return (
     <Box
       sx={{
-        borderRadius: 3,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         p: 2,

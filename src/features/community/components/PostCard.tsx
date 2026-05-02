@@ -68,17 +68,17 @@ export function PostCard({ post }: PostCardProps) {
   const isUpvoted = user && post.upvotes.includes(user._id);
 
   return (
-    <Card sx={{ mb: 2 }}>
+    <Card sx={{ mb: 1.5, elevation: 0, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', '&:hover': { borderColor: 'primary.light' } }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'secondary.main' }}>
+          <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
             {post.author.name?.[0]?.toUpperCase() || 'U'}
           </Avatar>
         }
         action={
           hasEditPermission ? (
             <>
-              <IconButton onClick={handleMenuClick}>
+              <IconButton onClick={handleMenuClick} sx={{ color: 'text.secondary' }}>
                 <MoreVertIcon />
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
@@ -99,8 +99,9 @@ export function PostCard({ post }: PostCardProps) {
         }
         title={post.author.name || 'Unknown'}
         subheader={formatRelativeTime(post.createdAt)}
+        sx={{ pb: 1, '& .MuiCardHeader-title': { fontWeight: 600 }, '& .MuiCardHeader-subheader': { color: 'text.disabled', fontSize: '0.75rem' } }}
       />
-      <CardContent>
+      <CardContent sx={{ pt: 0 }}>
         {isEditing ? (
           <Stack spacing={2}>
             <TextField
@@ -148,13 +149,13 @@ export function PostCard({ post }: PostCardProps) {
         )}
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton onClick={() => toggleUpvote(post._id)} aria-label="upvote">
+        <IconButton onClick={() => toggleUpvote(post._id)} aria-label="upvote" sx={{ minHeight: 44 }}>
           {isUpvoted ? <ThumbUpIcon color="primary" /> : <ThumbUpOutlinedIcon />}
         </IconButton>
         <Typography variant="body2" sx={{ mr: 2 }}>
           {post.upvotes.length}
         </Typography>
-        <IconButton onClick={() => setShowComments(!showComments)} aria-label="comments">
+        <IconButton onClick={() => setShowComments(!showComments)} aria-label="comments" sx={{ minHeight: 44 }}>
           <ChatBubbleOutlineIcon />
         </IconButton>
         <Typography variant="body2">{post.commentCount}</Typography>

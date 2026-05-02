@@ -90,7 +90,7 @@ export default function CommunityPage() {
         {/* Right Widget Area - Disappears on mobile */}
         <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <Box sx={{ position: 'sticky', top: 24, zIndex: 1 }}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, elevation: 0, border: '1px solid', borderColor: 'divider' }}>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
                   Community Rules

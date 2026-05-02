@@ -62,7 +62,7 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
           display: 'flex',
           alignItems: 'flex-end',
           gap: 1,
-          bgcolor: 'background.default',
+          bgcolor: 'background.paper',
           border: '1px solid',
           borderColor: isOverLimit ? 'error.main' : 'divider',
           borderRadius: '12px',
@@ -70,7 +70,7 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
           py: 1,
           transition: 'border-color 0.15s',
           '&:focus-within': {
-            borderColor: isOverLimit ? 'error.main' : 'rgba(108, 99, 255, 0.5)',
+            borderColor: isOverLimit ? 'error.main' : 'primary.light',
           },
         }}
       >
@@ -107,14 +107,12 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
             height: 34,
             borderRadius: '9px',
             flexShrink: 0,
-            background: canSend
-              ? 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)'
-              : 'rgba(108, 99, 255, 0.15)',
-            color: '#fff',
+            bgcolor: canSend ? 'primary.main' : 'action.disabledBackground',
+            color: canSend ? 'primary.contrastText' : 'text.disabled',
             transition: 'opacity 0.15s, transform 0.1s',
-            '&:hover': { opacity: 0.88, background: 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)' },
+            '&:hover': { opacity: 0.88 },
             '&:active': { transform: 'scale(0.93)' },
-            '&.Mui-disabled': { color: 'rgba(255,255,255,0.3)' },
+            '&.Mui-disabled': { color: 'text.disabled' },
           }}
         >
           <ArrowUpwardIcon sx={{ fontSize: 18 }} />

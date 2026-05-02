@@ -14,7 +14,7 @@ export default function ConversationsPage() {
 
   // Desktop: right panel (conversation list) + center (chat or empty state)
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <Box sx={{ display: "flex", height: "100%", overflow: "hidden" }}>
       {/* Center — chat or empty state */}
       <Box
         sx={{
@@ -22,6 +22,7 @@ export default function ConversationsPage() {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          bgcolor: "background.default",
         }}
       >
         <Outlet />
@@ -31,11 +32,13 @@ export default function ConversationsPage() {
       <Box
         sx={{
           width: 320,
-          borderLeft: `1px solid ${theme.palette.divider}`,
+          borderLeft: "1px solid",
+          borderColor: "divider",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
           flexShrink: 0,
+          bgcolor: "background.paper",
         }}
       >
         <ConversationList />

@@ -30,7 +30,7 @@ export function ChatEmptyState({ onSuggestionClick }: ChatEmptyStateProps) {
           width: 52,
           height: 52,
           borderRadius: '14px',
-          bgcolor: 'rgba(108, 99, 255, 0.12)',
+          bgcolor: 'action.selected',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -64,9 +64,9 @@ export function ChatEmptyState({ onSuggestionClick }: ChatEmptyStateProps) {
               borderRadius: '16px',
               cursor: 'pointer',
               '&:hover': {
-                color: 'primary.light',
-                borderColor: 'rgba(108, 99, 255, 0.35)',
-                bgcolor: 'rgba(108, 99, 255, 0.06)',
+                color: 'primary.main',
+                borderColor: 'primary.light',
+                bgcolor: 'action.hover',
               },
             }}
           />

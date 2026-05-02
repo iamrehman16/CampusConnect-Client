@@ -34,8 +34,18 @@ export default function BottomNav() {
 
   return (
     <Paper
-      sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1100 }}
-      elevation={8}
+      sx={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1100,
+        elevation: 0,
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+      elevation={0}
     >
       <BottomNavigation
         value={activeIndex === -1 ? 0 : activeIndex}
@@ -45,8 +55,19 @@ export default function BottomNav() {
         showLabels
         sx={{
           bgcolor: 'background.paper',
+          height: 64,
           '& .Mui-selected': {
             color: 'primary.main',
+          },
+          '& .MuiBottomNavigationAction-root': {
+            minWidth: 48,
+            padding: '6px 0',
+            '@media (pointer: coarse)': {
+              padding: '8px 0',
+            },
+            '& .MuiBottomNavigationAction-label': {
+              fontSize: '0.6875rem',
+            },
           },
         }}
       >

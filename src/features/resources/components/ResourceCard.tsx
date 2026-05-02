@@ -122,10 +122,10 @@ export function ResourceCard({ resource, onEdit, onDelete }: ResourceCardProps) 
         bgcolor: 'background.paper',
         border: '1px solid',
         borderColor: 'divider',
-        transition: 'border-color 0.2s, transform 0.2s',
+        elevation: 0,
+        transition: 'border-color 0.2s',
         '&:hover': {
-          borderColor: 'primary.main',
-          transform: 'translateY(-2px)',
+          borderColor: 'primary.light',
         },
       }}
     >

@@ -105,6 +105,7 @@ export default function ConversationPage() {
         flexDirection: "column",
         height: "100%",
         overflow: "hidden",
+        bgcolor: "background.default",
       }}
     >
       {/* Header */}
@@ -115,16 +116,19 @@ export default function ConversationPage() {
           display: "flex",
           alignItems: "center",
           gap: 1.5,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderBottom: "1px solid",
+          borderColor: "divider",
           flexShrink: 0,
+          bgcolor: "background.paper",
+          minHeight: 56,
         }}
       >
         {isMobile && (
-          <IconButton size="small" onClick={() => navigate("/chat")}>
+          <IconButton size="small" onClick={() => navigate("/chat")} sx={{ minWidth: 44, minHeight: 44 }}>
             <ArrowBack fontSize="small" />
           </IconButton>
         )}
-        <Avatar sx={{ width: 36, height: 36 }} />
+        <Avatar sx={{ width: 40, height: 40, bgcolor: "primary.main" }} />
         <Typography variant="subtitle1" fontWeight={600}>
           {otherParticipant?.name ?? "Unknown"}
         </Typography>

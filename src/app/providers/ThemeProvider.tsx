@@ -2,7 +2,7 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
-import theme from '@/theme/theme';
+import { useThemeMode } from '@/shared/hooks/useThemeMode';
 import type { ReactNode } from 'react';
 
 interface ThemeProviderProps {
@@ -10,6 +10,8 @@ interface ThemeProviderProps {
 }
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
+  const { theme } = useThemeMode();
+
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />

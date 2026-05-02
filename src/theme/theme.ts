@@ -1,6 +1,8 @@
 import { createTheme } from '@mui/material/styles';
-import { palette } from './palette';
+import { getPalette } from './palette';
 import { componentOverrides } from './components';
+
+const palette = getPalette('dark');
 
 /**
  * Application MUI theme.

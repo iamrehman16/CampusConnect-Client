@@ -29,12 +29,13 @@ export function ConversationListItem({
         py: 1.5,
         gap: 1.5,
         alignItems: "flex-start",
+        minHeight: 64,
         "&.Mui-selected": {
           bgcolor: "action.selected",
         },
       }}
     >
-      <Avatar sx={{ width: 40, height: 40, flexShrink: 0, mt: 0.25 }} />
+      <Avatar sx={{ width: 40, height: 40, flexShrink: 0, mt: 0.25, bgcolor: "primary.main" }} />
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Box
           sx={{ display: "flex", justifyContent: "space-between", mb: 0.25 }}
@@ -61,6 +62,7 @@ export function ConversationListItem({
           color="text.secondary"
           noWrap
           display="block"
+          mt={0.25}
         >
           {conversation.lastMessage?.content ?? "No messages yet"}
         </Typography>

@@ -34,9 +34,11 @@ export function MessageBubble({
         sx={{
           px: 1.5,
           py: 1,
-          borderRadius: 2,
-          bgcolor: isOwn ? "primary.main" : "action.hover",
+          borderRadius: isOwn ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+          bgcolor: isOwn ? "primary.main" : "background.paper",
           color: isOwn ? "primary.contrastText" : "text.primary",
+          border: isOwn ? "none" : "1px solid",
+          borderColor: isOwn ? "transparent" : "divider",
           opacity: message._status === "PENDING" ? 0.7 : 1,
         }}
       >

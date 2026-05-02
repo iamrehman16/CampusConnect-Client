@@ -57,6 +57,7 @@ export default function AiChatPage() {
           borderBottom: '1px solid',
           borderColor: 'divider',
           flexShrink: 0,
+          minHeight: 56,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
@@ -65,7 +66,7 @@ export default function AiChatPage() {
               width: 36,
               height: 36,
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #6C63FF 0%, #938BFF 100%)',
+              bgcolor: 'primary.main',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -88,7 +89,7 @@ export default function AiChatPage() {
             size="small"
             variant="outlined"
             onClick={() => clearSession()}
-            sx={{ color: 'text.secondary', borderColor: 'divider', fontSize: '0.75rem' }}
+            sx={{ color: 'text.secondary', borderColor: 'divider', fontSize: '0.75rem', minHeight: 32 }}
           >
             Clear
           </Button>
@@ -105,6 +106,7 @@ export default function AiChatPage() {
           display: 'flex',
           flexDirection: 'column',
           gap: 1.5,
+          bgcolor: 'background.default',
           // Thin scrollbar on desktop
           '&::-webkit-scrollbar': { width: 3 },
           '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 4 },
@@ -125,7 +127,8 @@ export default function AiChatPage() {
           px: 1.5,
           pt: 1,
           pb: 1.5,
-          bgcolor: 'background.default',
+          bgcolor: 'background.paper',
+          borderTop: '1px solid',
           borderColor: 'divider',
           flexShrink: 0,
         }}
