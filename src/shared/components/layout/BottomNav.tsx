@@ -6,7 +6,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ForumIcon from '@mui/icons-material/Forum';
-import PersonIcon from '@mui/icons-material/Person';
 import { ROUTES } from '@/shared/constants/routes';
 
 const NAV_ITEMS = [
@@ -14,7 +13,6 @@ const NAV_ITEMS = [
   { label: 'Resources', icon: <LibraryBooksIcon />, path: ROUTES.RESOURCES },
   { label: 'AI Chat', icon: <SmartToyIcon />, path: ROUTES.AI_CHAT },
   { label: 'Community', icon: <ForumIcon />, path: ROUTES.COMMUNITY },
-  { label: 'Profile', icon: <PersonIcon />, path: ROUTES.PROFILE },
 ];
 
 /**

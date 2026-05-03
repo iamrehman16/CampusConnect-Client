@@ -121,13 +121,16 @@ const PublicProfilePage: React.FC = () => {
         <Box sx={{ mt: { xs: 0, sm: 2 } }}>
           <Box
             sx={{
-              borderBottom: "1px solid rgba(255,255,255,0.07)",
+              borderBottom: '1px solid',
+              borderColor: 'divider',
               px: { xs: 2, sm: 0 },
             }}
           >
             <Tabs
               value={activeTab}
               onChange={(_, v) => setActiveTab(v)}
+              textColor="primary"
+              indicatorColor="primary"
               sx={{
                 "& .MuiTab-root": {
                   textTransform: "none",
@@ -136,12 +139,10 @@ const PublicProfilePage: React.FC = () => {
                   color: "text.secondary",
                   minHeight: 48,
                   "&.Mui-selected": {
-                    color: "#6C63FF",
                     fontWeight: 700,
                   },
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: "#6C63FF",
                   height: 2,
                   borderRadius: "2px 2px 0 0",
                 },

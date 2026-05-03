@@ -5,6 +5,8 @@ import ProtectedRoute from "@/app/routes/ProtectedRoute";
 import PublicRoute from "@/app/routes/PublicRoute";
 import RoleRoute from "@/app/routes/RoleRoute";
 import AppLayout from "@/shared/components/layout/AppLayout";
+import CenterLayout from "@/shared/components/layout/CenterLayout";
+import MainLayout from "@/shared/components/layout/MainLayout";
 import LoadingScreen from "@/shared/components/feedback/LoadingScreen";
 import { UserRole } from "@/shared/types/enums";
 
@@ -89,7 +91,9 @@ const router = createBrowserRouter([
             path: ROUTES.RESOURCES,
             element: (
               <SuspenseWrapper>
-                <ResourcePage />
+                <MainLayout>
+                  <ResourcePage />
+                </MainLayout>
               </SuspenseWrapper>
             ),
           },
@@ -107,7 +111,7 @@ const router = createBrowserRouter([
             path: ROUTES.AI_CHAT,
             element: (
               <SuspenseWrapper>
-                <AiChatPage />
+                  <AiChatPage />
               </SuspenseWrapper>
             ),
           },
@@ -152,7 +156,9 @@ const router = createBrowserRouter([
             path: ROUTES.PROFILE,
             element: (
               <SuspenseWrapper>
-                <ProfilePage />
+                <MainLayout>
+                  <ProfilePage />
+                </MainLayout>
               </SuspenseWrapper>
             ),
           },
@@ -161,7 +167,9 @@ const router = createBrowserRouter([
             path: ROUTES.PUBLIC_PROFILE,
             element: (
               <SuspenseWrapper>
-                <PublicProfilePage />
+                <MainLayout>
+                  <PublicProfilePage />
+                </MainLayout>
               </SuspenseWrapper>
             ),
           },
@@ -170,7 +178,9 @@ const router = createBrowserRouter([
             path: ROUTES.CONTRIBUTORS,
             element: (
               <SuspenseWrapper>
-                <ContributorsPage />
+                <MainLayout>
+                  <ContributorsPage />
+                </MainLayout>
               </SuspenseWrapper>
             ),
           },

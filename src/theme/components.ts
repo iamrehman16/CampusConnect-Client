@@ -135,4 +135,67 @@ export const componentOverrides: Components<Theme> = {
       root: { textTransform: 'none', fontWeight: 600 },
     },
   },
+
+  MuiDialog: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 16,
+        backgroundImage: 'none',
+      },
+    },
+  },
+
+  MuiPopover: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 12,
+        backgroundImage: 'none',
+      },
+    },
+  },
+
+  MuiMenu: {
+    styleOverrides: {
+      paper: ({ theme }) => ({
+        borderRadius: 12,
+        backgroundImage: 'none',
+        border: '1px solid',
+        borderColor: theme.palette.divider,
+      }),
+    },
+  },
+
+  MuiTooltip: {
+    styleOverrides: {
+      tooltip: {
+        borderRadius: 4,
+        fontSize: '0.75rem',
+      },
+    },
+  },
+
+  MuiAlert: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+
+  MuiAvatar: {
+    styleOverrides: {
+      root: {
+        fontWeight: 600,
+        fontSize: '0.875rem',
+      },
+    },
+  },
+
+  MuiListItemButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
 };

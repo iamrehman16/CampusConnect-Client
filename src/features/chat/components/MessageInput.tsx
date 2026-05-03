@@ -33,9 +33,6 @@ export function MessageInput({ conversationId, sendMessage }: Props) {
         gap: 1,
         px: 2,
         py: 1.5,
-        bgcolor: "background.paper",
-        borderTop: "1px solid",
-        borderColor: "divider",
       }}
     >
       <TextField
@@ -50,18 +47,37 @@ export function MessageInput({ conversationId, sendMessage }: Props) {
         size="small"
         sx={{
           "& .MuiOutlinedInput-root": {
-            borderRadius: 3,
-            bgcolor: "background.default",
+            borderRadius: "24px",
+            bgcolor: "background.paper",
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "primary.light",
+              borderWidth: "1.5px",
+            },
           },
         }}
       />
       <IconButton
+        size="small"
         onClick={handleSend}
         disabled={!content.trim()}
-        color="primary"
-        sx={{ mb: 0.25, minWidth: 44, minHeight: 44 }}
+        sx={{
+          width: 40,
+          height: 40,
+          flexShrink: 0,
+          mb: 0.25,
+          bgcolor: content.trim() ? "primary.main" : "action.disabledBackground",
+          color: content.trim() ? "primary.contrastText" : "text.disabled",
+          borderRadius: "50%",
+          "&:hover": {
+            bgcolor: content.trim() ? "primary.dark" : "action.disabledBackground",
+          },
+          "&.Mui-disabled": {
+            bgcolor: "action.disabledBackground",
+            color: "text.disabled",
+          },
+        }}
       >
-        <Send fontSize="small" />
+        <Send sx={{ fontSize: 18 }} />
       </IconButton>
     </Box>
   );

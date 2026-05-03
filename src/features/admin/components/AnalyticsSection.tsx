@@ -54,71 +54,37 @@ export default function AnalyticsSection() {
         </Grid>
       </Grid>
 
-      {/* Row 2 — distributions */}
+      {/* Row 2 — distributions + contributors (3 items) */}
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <ChartCard title="By file type" loading={isLoading} height={220}>
-            {resources.data && (
-              <FileTypeBarChart data={resources.data.byFileType} />
-            )}
-          </ChartCard>
-        </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <ChartCard
-            title="By subject"
-            subtitle="Top 8"
-            loading={isLoading}
-            height={220}
-          >
-            {resources.data && (
-              <SubjectBarChart data={resources.data.bySubject} />
-            )}
+          <ChartCard title="By subject" subtitle="Top 8" loading={isLoading} height={260}>
+            {resources.data && <SubjectBarChart data={resources.data.bySubject} />}
           </ChartCard>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <ChartCard title="Top contributors" loading={isLoading} height={260}>
+            {resources.data && <TopContributorsTable data={resources.data.topContributors} />}
+          </ChartCard>
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <ChartCard title="By file type" loading={isLoading} height={260}>
+            {resources.data && <FileTypeBarChart data={resources.data.byFileType} />}
+          </ChartCard>
+        </Grid>
+      </Grid>
+
+      {/* Row 3 — user growth full width */}
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12 }}>
           <ChartCard
             title="User registrations"
             subtitle="Last 30 days"
             loading={isLoading}
           >
-            {growth.data && (
-              <UserGrowthChart data={growth.data.dailyRegistrations} />
-            )}
+            {growth.data && <UserGrowthChart data={growth.data.dailyRegistrations} />}
           </ChartCard>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-          <ChartCard title="Top contributors" loading={isLoading} height={220}>
-            {resources.data && (
-              <TopContributorsTable data={resources.data.topContributors} />
-            )}
-          </ChartCard>
-        </Grid>
-      </Grid>
-
-      {/* Row 3 — single metric */}
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 4, md: 3 }}>
-          <Box
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              border: "1px solid",
-              borderColor: "divider",
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-            }}
-          >
-            <Typography variant="caption" color="text.secondary">
-              Avg. time to approval
-            </Typography>
-            <Typography variant="h4" fontWeight={700}>
-              {isLoading ? "—" : `${resources.data?.avgApprovalHours}h`}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              across all approved resources
-            </Typography>
-          </Box>
         </Grid>
       </Grid>
     </Box>

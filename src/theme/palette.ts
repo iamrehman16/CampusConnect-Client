@@ -44,7 +44,7 @@ export const getPalette = (mode: PaletteMode) =>
           secondary: '#94A3B8',
           disabled: '#475569',
         },
-        divider: 'rgba(148, 163, 184, 0.12)',
+        divider: 'rgba(148, 163, 184, 0.18)',
         action: {
           hover: 'rgba(108, 99, 255, 0.08)',
           selected: 'rgba(108, 99, 255, 0.16)',
@@ -93,7 +93,7 @@ export const getPalette = (mode: PaletteMode) =>
           secondary: '#5E6778',
           disabled: '#9BA3AF',
         },
-        divider: 'rgba(0, 0, 0, 0.08)',
+        divider: 'rgba(0, 0, 0, 0.14)',
         action: {
           hover: 'rgba(108, 99, 255, 0.06)',
           selected: 'rgba(108, 99, 255, 0.12)',

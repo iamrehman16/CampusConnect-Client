@@ -49,27 +49,28 @@ const StatBox = ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: 0.5,
-      px: { xs: 1.25, sm: 2 },
-      py: { xs: 1, sm: 1.5 },
+      gap: { xs: 0.25, sm: 0.5 },
+      px: { xs: 0.75, sm: 2 },
+      py: { xs: 0.75, sm: 1.5 },
       borderRadius: 2,
       bgcolor: "action.hover",
       border: "1px solid",
       borderColor: "divider",
-      minWidth: { xs: 68, sm: 80 },
+      minWidth: { xs: 0, sm: 80 },
+      flex: { xs: 1, sm: 'unset' },
     }}
   >
     <Box sx={{ color, display: "flex", alignItems: "center" }}>{icon}</Box>
     <Typography
       variant="h6"
       fontWeight={700}
-      sx={{ color: "text.primary", lineHeight: 1 }}
+      sx={{ color: "text.primary", lineHeight: 1, fontSize: { xs: '1rem', sm: '1.25rem' } }}
     >
       {value}
     </Typography>
     <Typography
       variant="caption"
-      sx={{ color: "text.secondary", fontSize: "0.65rem", textAlign: "center" }}
+      sx={{ color: "text.secondary", fontSize: { xs: "0.6rem", sm: "0.65rem" }, textAlign: "center" }}
     >
       {label}
     </Typography>
@@ -103,9 +104,9 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
       <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
         {/* Top row: avatar + info + actions */}
         <Stack
-          direction="row"
-          spacing={{ xs: 1.5, sm: 2 }}
-          alignItems="flex-start"
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={{ xs: 1, sm: 2 }}
+          alignItems={{ xs: 'center', sm: 'flex-start' }}
         >
           {isLoading ? (
             <Skeleton variant="circular" width={64} height={64} />
@@ -113,12 +114,12 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
             <Avatar
               alt={user?.name}
               sx={{
-                width: { xs: 56, sm: 72 },
-                height: { xs: 56, sm: 72 },
-                fontSize: { xs: "1.35rem", sm: "1.75rem" },
+                width: { xs: 72, sm: 72 },
+                height: { xs: 72, sm: 72 },
+                fontSize: { xs: '1.75rem', sm: '1.75rem' },
                 fontWeight: 700,
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
                 flexShrink: 0,
               }}
             >
@@ -131,6 +132,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
             sx={{
               flex: 1,
               minWidth: 0,
+              width: '100%',
             }}
           >
             {isLoading ? (
@@ -143,9 +145,8 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                 <Stack
                   direction="row"
                   alignItems="flex-start"
-                  justifyContent="space-between"
+                  justifyContent={{ xs: 'center', sm: 'space-between' }}
                   spacing={1}
-                  sx={{ width: "100%" }}
                 >
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Stack
@@ -153,11 +154,12 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                       alignItems="center"
                       spacing={0.75}
                       flexWrap="wrap"
+                      justifyContent={{ xs: 'center', sm: 'flex-start' }}
                     >
                       <Typography
                         variant="h6"
                         fontWeight={700}
-                        sx={{ lineHeight: 1.2 }}
+                        sx={{ lineHeight: 1.2, textAlign: { xs: 'center', sm: 'left' } }}
                       >
                         {user?.name}
                       </Typography>
@@ -176,6 +178,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                         direction="row"
                         alignItems="center"
                         spacing={0.5}
+                        justifyContent={{ xs: 'center', sm: 'flex-start' }}
                         sx={{ mt: 0.5 }}
                       >
                         <CalendarToday sx={{ fontSize: 12, color: "text.secondary" }} />
@@ -187,7 +190,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                   </Box>
 
                   {actions && (
-                    <Box sx={{ flexShrink: 0, ml: 1 }}>
+                    <Box sx={{ flexShrink: 0, display: { xs: 'none', sm: 'block' } }}>
                       {actions}
                     </Box>
                   )}
@@ -197,7 +200,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                   direction="row"
                   spacing={1}
                   flexWrap="wrap"
-                  useFlexGap
+                  justifyContent={{ xs: 'center', sm: 'flex-start' }}
                   sx={{ mt: 0.75 }}
                 >
                   {(user?.academicInfo || user?.semester) && (
@@ -225,6 +228,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                       WebkitLineClamp: { xs: 2, sm: 3 },
                       WebkitBoxOrient: "vertical",
                       overflow: "hidden",
+                      textAlign: { xs: 'center', sm: 'left' },
                     }}
                   >
                     {user.expertise}
@@ -235,25 +239,33 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
           </Box>
         </Stack>
 
-        <Divider sx={{ my: 2 }} />
+        {/* Actions — shown on xs only, below content */}
+        {actions && (
+          <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'center', mt: 1.5 }}>
+            {actions}
+          </Box>
+        )}
+
+        <Divider sx={{ my: { xs: 1.5, sm: 2 } }} />
 
         <Stack
           direction="row"
-          spacing={1}
-          flexWrap="wrap"
-          useFlexGap
-          justifyContent={{ xs: "space-between", sm: "flex-start" }}
+          spacing={{ xs: 0.75, sm: 1 }}
+          justifyContent="stretch"
+          sx={{ width: '100%' }}
         >
           {isLoading ? (
             [0, 1, 2, 3].map((i) => (
-              <Skeleton key={i} variant="rounded" width={76} height={64} />
+              <Box key={i} sx={{ flex: 1 }}>
+                <Skeleton variant="rounded" width="100%" height={64} />
+              </Box>
             ))
           ) : (
             <>
               <Tooltip title="Total posts" arrow>
                 <span>
                   <StatBox
-                    icon={<Article sx={{ fontSize: 16 }} />}
+                    icon={<Article sx={{ fontSize: { xs: 14, sm: 16 } }} />}
                     value={stats?.totalPosts ?? 0}
                     label="Posts"
                     color="primary.main"
@@ -263,7 +275,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
               <Tooltip title="Approved resources" arrow>
                 <span>
                   <StatBox
-                    icon={<CheckCircle sx={{ fontSize: 16 }} />}
+                    icon={<CheckCircle sx={{ fontSize: { xs: 14, sm: 16 } }} />}
                     value={stats?.approvedResources ?? 0}
                     label="Approved"
                     color="success.main"
@@ -273,7 +285,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
               <Tooltip title="Pending review" arrow>
                 <span>
                   <StatBox
-                    icon={<HourglassEmpty sx={{ fontSize: 16 }} />}
+                    icon={<HourglassEmpty sx={{ fontSize: { xs: 14, sm: 16 } }} />}
                     value={stats?.pendingResources ?? 0}
                     label="Pending"
                     color="warning.main"
@@ -283,7 +295,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
               <Tooltip title="Rejected resources" arrow>
                 <span>
                   <StatBox
-                    icon={<Cancel sx={{ fontSize: 16 }} />}
+                    icon={<Cancel sx={{ fontSize: { xs: 14, sm: 16 } }} />}
                     value={stats?.rejectedResources ?? 0}
                     label="Rejected"
                     color="error.main"

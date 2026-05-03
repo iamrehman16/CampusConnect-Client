@@ -113,18 +113,13 @@ const ProfilePage: React.FC = () => {
           actions={
             <Button
               variant="outlined"
+              color="primary"
               startIcon={<Edit />}
               size="small"
               onClick={() => setActiveTab(2)}
               sx={{
                 textTransform: "none",
-                borderColor: "rgba(108,99,255,0.4)",
-                color: "#6C63FF",
                 fontWeight: 600,
-                "&:hover": {
-                  borderColor: "#6C63FF",
-                  background: "rgba(108,99,255,0.08)",
-                },
               }}
             >
               Edit Profile
@@ -141,13 +136,16 @@ const ProfilePage: React.FC = () => {
         >
           <Box
             sx={{
-              borderBottom: "1px solid rgba(255,255,255,0.07)",
+              borderBottom: '1px solid',
+              borderColor: 'divider',
               px: { xs: 2, sm: 0 },
             }}
           >
             <Tabs
               value={activeTab}
               onChange={(_, v) => setActiveTab(v)}
+              textColor="primary"
+              indicatorColor="primary"
               sx={{
                 "& .MuiTab-root": {
                   textTransform: "none",
@@ -156,12 +154,10 @@ const ProfilePage: React.FC = () => {
                   color: "text.secondary",
                   minHeight: 48,
                   "&.Mui-selected": {
-                    color: "#6C63FF",
                     fontWeight: 700,
                   },
                 },
                 "& .MuiTabs-indicator": {
-                  backgroundColor: "#6C63FF",
                   height: 2,
                   borderRadius: "2px 2px 0 0",
                 },
