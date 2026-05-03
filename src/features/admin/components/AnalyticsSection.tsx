@@ -1,7 +1,6 @@
 // features/admin/components/AnalyticsSection.tsx
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import ChartCard from "./ChartCard";
 import UploadsLineChart from "./UploadsLineChart";

@@ -5,7 +5,6 @@ import ProtectedRoute from "@/app/routes/ProtectedRoute";
 import PublicRoute from "@/app/routes/PublicRoute";
 import RoleRoute from "@/app/routes/RoleRoute";
 import AppLayout from "@/shared/components/layout/AppLayout";
-import CenterLayout from "@/shared/components/layout/CenterLayout";
 import MainLayout from "@/shared/components/layout/MainLayout";
 import LoadingScreen from "@/shared/components/feedback/LoadingScreen";
 import { UserRole } from "@/shared/types/enums";

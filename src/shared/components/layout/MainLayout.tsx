@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
-import CenterLayout from './CenterLayout';
 import RightRail from './RightRail';
 
 interface MainLayoutProps {
