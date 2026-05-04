@@ -32,6 +32,7 @@ import { UserRole } from '@/shared/types/enums';
 import { ROUTES } from '@/shared/constants/routes';
 import resourceService from '../services/resource.service';
 import { formatRelativeTime } from '@/shared/utils/format';
+import { PageContainer } from '@/shared/components/PageContainer';
 
 // ─── File type config (mirrors ResourceCard) ──────────────────────────────────
 
@@ -78,16 +79,23 @@ export default function ResourceDetailPage() {
   const { data: resource, isLoading, isError } = useResource(id!);
   const { mutate: deleteResource } = useDeleteResource();
 
-  if (isLoading) return <DetailSkeleton />;
+  if (isLoading)
+    return (
+      <PageContainer>
+        <DetailSkeleton />
+      </PageContainer>
+    );
 
   if (isError || !resource) {
     return (
-      <Box textAlign="center" py={10}>
-        <Typography variant="h6" color="text.secondary">Resource not found.</Typography>
-        <Button onClick={() => navigate(ROUTES.RESOURCES)} sx={{ mt: 2 }}>
-          Back to Resources
-        </Button>
-      </Box>
+      <PageContainer>
+        <Box textAlign="center" py={10}>
+          <Typography variant="h6" color="text.secondary">Resource not found.</Typography>
+          <Button onClick={() => navigate(ROUTES.RESOURCES)} sx={{ mt: 2 }}>
+            Back to Resources
+          </Button>
+        </Box>
+      </PageContainer>
     );
   }
 
@@ -120,7 +128,8 @@ export default function ResourceDetailPage() {
   };
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, maxWidth: 800, mx: 'auto' }}>
+    <PageContainer>
+      <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, maxWidth: 800, mx: 'auto' }}>
       {/* Back button */}
       <Button
         startIcon={<ArrowBackIcon />}
@@ -381,5 +390,6 @@ export default function ResourceDetailPage() {
         onClose={() => setEditOpen(false)}
       />
     </Box>
+    </PageContainer>
   );
 }

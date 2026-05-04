@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
+import { PageContainer } from '@/shared/components/PageContainer';
 
 /**
  * Auth route-level page.
@@ -22,10 +23,11 @@ export default function AuthPage() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
+    <PageContainer>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         px: 2,
@@ -97,5 +99,6 @@ export default function AuthPage() {
         </CardContent>
       </Card>
     </Box>
+    </PageContainer>
   );
 }

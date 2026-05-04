@@ -7,6 +7,7 @@ import {
   Tabs,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
+import { PageContainer } from '@/shared/components/PageContainer';
 
 import { useMyProfile, useUpdateProfile } from "../hooks/profile-hooks";
 import { useOwnPosts } from "@/features/community/hooks/community.hooks";
@@ -103,7 +104,8 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+    <PageContainer>
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Container maxWidth="md" disableGutters={{ xs: true, sm: false } as any}>
         {/* ── Hero ─────────────────────────────────────────────────────── */}
         <ProfileHero
@@ -214,6 +216,7 @@ const ProfilePage: React.FC = () => {
         onClose={() => setEditTarget(null)}
       />
     </Box>
+    </PageContainer>
   );
 };
 

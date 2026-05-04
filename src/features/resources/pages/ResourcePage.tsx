@@ -29,7 +29,7 @@ import type { Resource, ResourceFilterParams } from "../types/resource.dto";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserRole } from "@/shared/types/enums";
 import { useDebounce } from "@/shared/hooks/useDebounce";
-
+import { PageContainer } from '@/shared/components/PageContainer';
 // ─── Filter bar config ────────────────────────────────────────────────────────
 
 const RESOURCE_TYPE_OPTIONS = [
@@ -161,7 +161,8 @@ export default function ResourcePage() {
   );
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, maxWidth: 1200, mx: "auto" }}>
+    <PageContainer>
+      <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, maxWidth: 1200, mx: "auto" }}>
       {/* Page header */}
       <Stack
         direction="row"
@@ -350,5 +351,6 @@ export default function ResourcePage() {
         onClose={() => setEditTarget(null)}
       />
     </Box>
+    </PageContainer>
   );
 }

@@ -32,10 +32,10 @@ export default function AiChatPage() {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
         // On mobile the bottom nav eats 56px; desktop has no bottom nav
         height: {
           xs: `calc(100dvh - ${BOTTOM_NAV_HEIGHT}px)`,

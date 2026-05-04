@@ -3,6 +3,7 @@ import { Box, Button, Container, Tab, Tabs, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { ApprovalStatus } from "@/shared/types/enums";
+import { PageContainer } from '@/shared/components/PageContainer';
 
 import { useUserProfile } from "../hooks/profile-hooks";
 import { usePostsByUser } from "@/features/community/hooks/community.hooks";
@@ -75,23 +76,26 @@ const PublicProfilePage: React.FC = () => {
 
   if (!userId) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "60vh",
-          color: "text.secondary",
-        }}
-      >
-        <Typography>User not found.</Typography>
-      </Box>
+      <PageContainer>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "60vh",
+            color: "text.secondary",
+          }}
+        >
+          <Typography>User not found.</Typography>
+        </Box>
+      </PageContainer>
     );
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <Container maxWidth="md" disableGutters={{ xs: true, sm: false } as any}>
+    <PageContainer>
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+        <Container maxWidth="md" disableGutters={{ xs: true, sm: false } as any}>
         {/* Back button */}
         <Box sx={{ px: { xs: 2, sm: 0 }, py: { xs: 1.5, sm: 2 } }}>
           <Button
@@ -179,7 +183,8 @@ const PublicProfilePage: React.FC = () => {
           </Box>
         </Box>
       </Container>
-    </Box>
+      </Box>
+    </PageContainer>
   );
 };
 

@@ -13,6 +13,7 @@ import AnalyticsSection from '../components/AnalyticsSection';
 import ResourcesTab from '../components/ResourceTab';
 import UsersTab from '../components/UserTab';
 import { useOverviewStats } from '../hooks/admin-hooks';
+import { PageContainer } from '@/shared/components/PageContainer';
 
 type TabValue = 'overview' | 'resources' | 'users';
 
@@ -25,7 +26,8 @@ export default function AdminDashboardPage() {
   const pendingCount = stats?.resources.pending ?? 0;
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <PageContainer>
+      <Box sx={{ p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 3 }}>
 
       {/* Page header */}
       <Box>
@@ -91,5 +93,6 @@ export default function AdminDashboardPage() {
       </Box>
 
     </Box>
+    </PageContainer>
   );
 }

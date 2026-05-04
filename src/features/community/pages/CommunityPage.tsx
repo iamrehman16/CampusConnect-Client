@@ -12,6 +12,7 @@ import { CreatePost } from '../components/CreatePost';
 import { PostCard } from '../components/PostCard';
 import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
 import { useEffect } from 'react';
+import { PageContainer } from '@/shared/components/PageContainer';
 
 export default function CommunityPage() {
   const {
@@ -35,7 +36,8 @@ export default function CommunityPage() {
   const posts = data?.pages.flatMap((page) => page.data) || [];
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
+    <PageContainer>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* 2-column layout */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3, maxWidth: 1152, mx: 'auto' }}>
 
@@ -122,5 +124,6 @@ export default function CommunityPage() {
         </Box>
       </Box>
     </Container>
+    </PageContainer>
   );
 }
