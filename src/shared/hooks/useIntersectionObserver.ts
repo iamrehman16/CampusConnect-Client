@@ -1,27 +1,30 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
-/**
- * Hook to observe if an element is in view.
- */
 export function useIntersectionObserver(options?: IntersectionObserverInit) {
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const targetRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting);
-    }, options);
-
-    if (targetRef.current) {
-      observer.observe(targetRef.current);
+  const targetRef = useCallback((node: HTMLDivElement | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
     }
 
-    return () => {
-      if (targetRef.current) {
-        observer.unobserve(targetRef.current);
+    if (!node) return;
+
+    observerRef.current = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsIntersecting(true);
+        observerRef.current?.disconnect();
       }
-    };
-  }, [options]);
+    }, {
+      threshold: options?.threshold,
+      rootMargin: options?.rootMargin,
+      root: options?.root,
+    });
+
+    observerRef.current.observe(node);
+  }, []);
 
   return { isIntersecting, targetRef };
 }
