@@ -12,6 +12,7 @@ import { UserRole } from "@/shared/types/enums";
 // ── Eager-loaded (first paint) ──────────────────────────────────────
 import AuthPage from "@/features/auth/pages/AuthPage";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
+import OnboardingRoute from "./routes/OnboardingRoute";
 
 // ── Lazy-loaded (code-split) ────────────────────────────────────────
 const ResourcePage = lazy(
@@ -50,6 +51,11 @@ const AdminDashboardPage = lazy(
   () => import("@/features/admin/pages/AdminDashboardPage"),
 );
 
+// add to lazy imports
+const OnboardingPage = lazy(
+  () => import("@/features/auth/pages/OnboardingPage"),
+);
+
 /**
  * Wraps a lazy component with Suspense fallback.
  */
@@ -68,6 +74,20 @@ const router = createBrowserRouter([
       {
         path: ROUTES.AUTH,
         element: <AuthPage />,
+      },
+    ],
+  },
+
+  {
+    element: <OnboardingRoute />,
+    children: [
+      {
+        path: ROUTES.ONBOARDING,
+        element: (
+          <SuspenseWrapper>
+            <OnboardingPage />
+          </SuspenseWrapper>
+        ),
       },
     ],
   },
@@ -110,7 +130,7 @@ const router = createBrowserRouter([
             path: ROUTES.AI_CHAT,
             element: (
               <SuspenseWrapper>
-                  <AiChatPage />
+                <AiChatPage />
               </SuspenseWrapper>
             ),
           },

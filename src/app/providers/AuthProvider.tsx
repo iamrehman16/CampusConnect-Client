@@ -4,16 +4,17 @@ import {
   useEffect,
   useCallback,
   type ReactNode,
-} from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import api from '@/shared/api/axios.instance';
-import { tokenStorage } from '@/shared/utils/storage';
-import type { User, AuthTokens, AuthState } from '@/shared/types/auth.types';
+} from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "@/shared/api/axios.instance";
+import { tokenStorage } from "@/shared/utils/storage";
+import type { User, AuthTokens, AuthState } from "@/shared/types/auth.types";
 
 // ── Context Shape ────────────────────────────────────────────────────
 interface AuthContextValue extends AuthState {
   login: (tokens: AuthTokens) => void;
   logout: () => void;
+  setOnboarded: () => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -36,13 +37,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
    */
   const fetchProfile = useCallback(async () => {
     try {
-      const { data } = await api.get<User>('/users/profile');
+      const { data } = await api.get<User>("/users/profile");
       setUser(data);
     } catch {
       // Token might be expired/invalid — clear everything
       tokenStorage.clearTokens();
       setUser(null);
     }
+  }, []);
+
+  const setOnboarded = useCallback(() => {
+    setUser((prev) => (prev ? { ...prev, isOnboarded: true } : prev));
   }, []);
 
   /**
@@ -62,7 +67,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
    */
   const logout = useCallback(async () => {
     try {
-      await api.post('/auth/signout');
+      await api.post("/auth/signout");
     } catch {
       // Silent fail — we're logging out anyway
     }
@@ -82,7 +87,9 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }, [fetchProfile]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout,  }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, isLoading, login, logout, setOnboarded }}
+    >
       {children}
     </AuthContext.Provider>
   );

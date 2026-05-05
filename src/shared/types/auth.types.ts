@@ -3,18 +3,21 @@ import type { UserRole, UserStatus } from './enums';
 /**
  * User profile as returned by GET /api/users/profile.
  */
+// shared/types/auth.types.ts
 export interface User {
   _id: string;
   email: string;
-  name?: string;
+  name: string;
   role: UserRole;
-  academicInfo?: string;
-  expertise?: string;
-  contributionScore: number;
-  accountStatus: UserStatus;
-  createdAt: string;
-  updatedAt: string;
-  semester?:number;
+  isOnboarded: boolean;  // add this
+  avatar?: string;
+  department?: string;
+  semester?: number;
+  interests?: string[];
+  expertise?: string[];
+  isOpenToMentor?: boolean;
+  contributionScore?: number;
+  accountStatus?: string;
 }
 
 /**
@@ -24,6 +27,7 @@ export interface AuthTokens {
   id: string;
   accessToken: string;
   refreshToken: string;
+  isOnboarded: boolean;  // add this
 }
 
 /**
