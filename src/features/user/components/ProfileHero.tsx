@@ -10,6 +10,7 @@ import {
   Stack,
   Tooltip,
   Typography,
+  IconButton,
 } from "@mui/material";
 import {
   CalendarToday,
@@ -18,6 +19,7 @@ import {
   HourglassEmpty,
   Cancel,
   Article,
+  PhotoCamera,
 } from "@mui/icons-material";
 import { UserRole } from "@/shared/types/enums";
 import type {
@@ -31,6 +33,8 @@ interface ProfileHeroProps {
   isLoading?: boolean;
   /** Slot for action buttons (Edit button on private, nothing on public) */
   actions?: React.ReactNode;
+  /** If provided, clicking the avatar will open the avatar chooser */
+  onAvatarClick?: () => void;
 }
 
 const StatBox = ({
@@ -82,6 +86,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
   stats,
   isLoading,
   actions,
+  onAvatarClick,
 }) => {
   const joinDate = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -111,20 +116,45 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
           {isLoading ? (
             <Skeleton variant="circular" width={64} height={64} />
           ) : (
-            <Avatar
-              alt={user?.name}
-              sx={{
-                width: { xs: 72, sm: 72 },
-                height: { xs: 72, sm: 72 },
-                fontSize: { xs: '1.75rem', sm: '1.75rem' },
-                fontWeight: 700,
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                flexShrink: 0,
-              }}
-            >
-              {user?.name?.charAt(0).toUpperCase()}
-            </Avatar>
+            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+              <Avatar
+                src={user?.avatar ?? undefined}
+                alt={user?.name}
+                sx={{
+                  width: { xs: 72, sm: 72 },
+                  height: { xs: 72, sm: 72 },
+                  fontSize: { xs: '1.75rem', sm: '1.75rem' },
+                  fontWeight: 700,
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  flexShrink: 0,
+                }}
+              >
+                {user?.name?.charAt(0).toUpperCase()}
+              </Avatar>
+              {onAvatarClick && (
+                <IconButton
+                  size="small"
+                  onClick={onAvatarClick}
+                  sx={{
+                    position: 'absolute',
+                    bottom: -4,
+                    right: -4,
+                    width: 32,
+                    height: 32,
+                    bgcolor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    boxShadow: 1,
+                    '&:hover': {
+                      bgcolor: 'background.paper',
+                    },
+                  }}
+                >
+                  <PhotoCamera fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
           )}
 
           {/* Name / meta */}
@@ -163,13 +193,19 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                       >
                         {user?.name}
                       </Typography>
-                      {user?.role === UserRole.ADMIN && (
+                      {user?.role && (
                         <Chip
-                          label="Admin"
+                          label={user.role}
                           size="small"
-                          color="primary"
                           variant="outlined"
-                          sx={{ height: 20, fontSize: "0.65rem", fontWeight: 600 }}
+                          color={user.role === UserRole.ADMIN ? 'primary' : 'default'}
+                          sx={{
+                            height: 20,
+                            fontSize: '0.65rem',
+                            fontWeight: 600,
+                            borderColor: user.role === UserRole.ADMIN ? 'primary.main' : 'divider',
+                            color: user.role === UserRole.ADMIN ? 'primary.main' : 'text.secondary',
+                          }}
                         />
                       )}
                     </Stack>
@@ -216,24 +252,53 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                   )}
                 </Stack>
 
-                {user?.expertise && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      mt: 1,
-                      lineHeight: 1.5,
-                      fontSize: "0.82rem",
-                      display: "-webkit-box",
-                      WebkitLineClamp: { xs: 2, sm: 3 },
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textAlign: { xs: 'center', sm: 'left' },
-                    }}
+                {user?.expertiseTags?.length ? (
+                  <Stack
+                    direction="row"
+                    flexWrap="wrap"
+                    gap={1}
+                    justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                    sx={{ mt: 1 }}
                   >
-                    {user.expertise}
-                  </Typography>
-                )}
+                    {user.expertiseTags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontSize: '0.75rem' }}
+                      />
+                    ))}
+                  </Stack>
+                ) : null}
+
+                {user?.interests?.length ? (
+                  <Box sx={{ mt: 1 }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', mb: 1, textAlign: { xs: 'center', sm: 'left' } }}
+                    >
+                      Interests
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      flexWrap="wrap"
+                      gap={1}
+                      justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                    >
+                      {user.interests.map((interest) => (
+                        <Chip
+                          key={interest}
+                          label={interest}
+                          size="small"
+                          variant="filled"
+                          sx={{ fontSize: '0.75rem', bgcolor: 'action.selected' }}
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                ) : null}
               </>
             )}
           </Box>

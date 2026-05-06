@@ -3,11 +3,13 @@ import {
   Box,
   Button,
   Container,
+  Stack,
   Tab,
   Tabs,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { PageContainer } from '@/shared/components/PageContainer';
+import ProfileAvatarDialog from "../components/ProfileAvatarDialog";
 
 import { useMyProfile, useUpdateProfile } from "../hooks/profile-hooks";
 import { useOwnPosts } from "@/features/community/hooks/community.hooks";
@@ -51,6 +53,7 @@ const ProfilePage: React.FC = () => {
     "all",
   );
   const [editTarget, setEditTarget] = useState<Resource | null>(null);
+  const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
 
   // ── Data hooks ──────────────────────────────────────────────────────────────
   const { data: profile, isLoading: profileLoading } = useMyProfile();
@@ -103,8 +106,19 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleAvatarSelect = (avatar: string) => {
+    setAvatarDialogOpen(false);
+    updateProfile({ avatar });
+  };
+
   return (
-    <PageContainer>
+    <PageContainer
+      sx={{
+        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+      }}
+    >
       <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Container maxWidth="md" disableGutters={{ xs: true, sm: false } as any}>
         {/* ── Hero ─────────────────────────────────────────────────────── */}
@@ -112,20 +126,35 @@ const ProfilePage: React.FC = () => {
           user={profileView}
           stats={stats}
           isLoading={profileLoading}
+          onAvatarClick={() => setAvatarDialogOpen(true)}
           actions={
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<Edit />}
-              size="small"
-              onClick={() => setActiveTab(2)}
-              sx={{
-                textTransform: "none",
-                fontWeight: 600,
-              }}
-            >
-              Edit Profile
-            </Button>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="center" justifyContent="center">
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<Edit />}
+                size="small"
+                onClick={() => setActiveTab(2)}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Edit Profile
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => setAvatarDialogOpen(true)}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Change Avatar
+              </Button>
+            </Stack>
           }
         />
 
@@ -210,6 +239,12 @@ const ProfilePage: React.FC = () => {
           </Box>
         </Box>
       </Container>
+      <ProfileAvatarDialog
+        open={avatarDialogOpen}
+        selectedAvatar={profileView?.avatar}
+        onClose={() => setAvatarDialogOpen(false)}
+        onSelect={handleAvatarSelect}
+      />
       <EditResourceModal
         open={Boolean(editTarget)}
         resource={editTarget}
