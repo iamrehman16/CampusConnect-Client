@@ -1,4 +1,4 @@
-import type { UserRole, UserStatus } from './enums';
+import type { UserRole } from './enums';
 
 /**
  * User profile as returned by GET /api/users/profile.
@@ -18,6 +18,7 @@ export interface User {
   isOpenToMentor?: boolean;
   contributionScore?: number;
   accountStatus?: string;
+  createdAt:string;
 }
 
 /**
