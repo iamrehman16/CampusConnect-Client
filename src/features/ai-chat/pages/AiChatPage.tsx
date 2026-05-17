@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import { useConversation, useSendMessage, useClearSession } from '../hooks/ai-chat.hooks';
@@ -6,19 +7,30 @@ import { MessageBubble } from '../components/MessageBubble';
 import { ChatInput } from '../components/ChatInput';
 import { ChatEmptyState } from '../components/ChatEmptyState';
 
-// Bottom nav height — keep in sync with your BottomNavigation component.
-// Only applied on mobile (xs/sm); desktop has no bottom nav.
 const BOTTOM_NAV_HEIGHT = 56;
 
 export default function AiChatPage() {
+  const location = useLocation();
   const { data: messages } = useConversation();
   const { mutate: sendMessage, isPending: isThinking } = useSendMessage();
   const { mutate: clearSession } = useClearSession();
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const [prefill, setPrefill] = useState<string | undefined>(undefined);
+  const promptFiredRef = useRef(false);
 
-  // Auto-scroll to the latest message whenever the list changes
+  // ── Consume initialPrompt from homepage CTA navigation state ─────────────
+  // Guard with a ref so React 18 Strict Mode double-invoke doesn't fire twice.
+  useEffect(() => {
+    const initialPrompt = location.state?.initialPrompt as string | undefined;
+    if (initialPrompt?.trim() && !promptFiredRef.current) {
+      promptFiredRef.current = true;
+      sendMessage({ message: initialPrompt.trim() });
+      window.history.replaceState({}, '');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally run once on mount
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -32,11 +44,10 @@ export default function AiChatPage() {
   };
 
   return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-        // On mobile the bottom nav eats 56px; desktop has no bottom nav
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
         height: {
           xs: `calc(100dvh - ${BOTTOM_NAV_HEIGHT}px)`,
           md: '100dvh',
@@ -107,7 +118,6 @@ export default function AiChatPage() {
           flexDirection: 'column',
           gap: 1.5,
           bgcolor: 'background.default',
-          // Thin scrollbar on desktop
           '&::-webkit-scrollbar': { width: 3 },
           '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 4 },
         }}
@@ -117,7 +127,6 @@ export default function AiChatPage() {
         ) : (
           messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
         )}
-        {/* Scroll anchor */}
         <div ref={bottomRef} />
       </Box>
 

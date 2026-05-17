@@ -17,4 +17,5 @@ export const ROUTES = {
   ADMIN_RESOURCES: "/admin/resources",
   CONTRIBUTORS: "/contributors",
   ONBOARDING: "/onboarding",
+  FAQ:"/faq"
 } as const;

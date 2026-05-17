@@ -56,6 +56,11 @@ const OnboardingPage = lazy(
   () => import("@/features/auth/pages/OnboardingPage"),
 );
 
+const FaqPage = lazy(
+  () => import("@/features/info/pages/FAQPage"),
+);
+
+
 /**
  * Wraps a lazy component with Suspense fallback.
  */
@@ -203,6 +208,18 @@ const router = createBrowserRouter([
               </SuspenseWrapper>
             ),
           },
+
+          {
+            path: ROUTES.FAQ,
+            element: (
+              <SuspenseWrapper>
+                <MainLayout>
+                  <FaqPage />
+                </MainLayout>
+              </SuspenseWrapper>
+            ),
+          },
+
 
           // ── Admin routes (role-gated) ─────────────────────────
           {

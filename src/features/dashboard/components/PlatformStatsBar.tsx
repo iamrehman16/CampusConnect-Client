@@ -1,64 +1,133 @@
-import { Box, Card, Typography, Skeleton, Stack } from "@mui/material";
+import { Box, Typography, Skeleton, Stack, IconButton } from "@mui/material";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { usePublicStats } from "@/features/dashboard/hooks/dashboard.hooks";
+import type { PublicStatsDto } from "../types/dashboard.types";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/shared/constants/routes";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const STATS_CONFIG = [
+const STATS_CONFIG: {
+  key: keyof PublicStatsDto;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}[] = [
   {
-    key: "totalUsers" as const,
+    key: "totalUsers",
     label: "Students",
-    icon: <PeopleOutlineIcon fontSize="small" />,
+    description:
+      "Registered students actively learning and collaborating on campus.",
+    icon: <PeopleOutlineIcon />,
   },
   {
-    key: "availableMentors" as const,
+    key: "availableMentors",
     label: "Mentors",
-    icon: <SchoolOutlinedIcon fontSize="small" />,
+    description:
+      "Contributors open to mentoring — sharing expertise and guiding peers.",
+    icon: <SchoolOutlinedIcon />,
   },
   {
-    key: "totalResources" as const,
+    key: "totalResources",
     label: "Resources",
-    icon: <FolderOutlinedIcon fontSize="small" />,
+    description:
+      "Study materials, notes, slides, and past papers shared by contributors.",
+    icon: <FolderOutlinedIcon />,
   },
   {
-    key: "postsThisMonth" as const,
+    key: "postsThisMonth",
     label: "Posts this month",
-    icon: <ForumOutlinedIcon fontSize="small" />,
+    description:
+      "Discussions, questions, and updates posted in the last 30 days.",
+    icon: <ForumOutlinedIcon />,
   },
 ];
 
-// ─── Single stat cell ─────────────────────────────────────────────────────────
+// ─── Single info card ─────────────────────────────────────────────────────────
 
-interface StatCellProps {
+interface StatInfoCardProps {
   icon: React.ReactNode;
   label: string;
+  description: string;
   value: number;
 }
 
-function StatCell({ icon, label, value }: StatCellProps) {
+function StatInfoCard({ icon, label, description, value }: StatInfoCardProps) {
+  const navigate = useNavigate();
   return (
-    <Stack alignItems="center" gap={0.5} sx={{ flex: 1 }}>
-      <Box sx={{ color: "text.disabled", display: "flex" }}>{icon}</Box>
-      <Typography variant="h6" fontWeight={700} lineHeight={1}>
+    <Box
+      sx={{
+        bgcolor: "action.hover",
+        borderRadius: 2,
+        p: { xs: 1.5, sm: 2 },
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
+      {/* Icon + value row */}
+      <Stack
+        direction="row"
+        alignItems="flex-start"
+        justifyContent="space-between"
+      >
+        <Box sx={{ color: "primary.light", display: "flex" }}>{icon}</Box>
+        <IconButton
+          size="small"
+          onClick={() => navigate(ROUTES.FAQ)}
+          sx={{
+            color: "text.disabled",
+            p: 0,
+            "&:hover": { color: "primary.main" },
+          }}
+          aria-label={`Learn more about ${label}`}
+        >
+          <ArrowForwardIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Stack>
+
+      <Typography variant="h5" fontWeight={700} lineHeight={1}>
         {value.toLocaleString()}
       </Typography>
-      <Typography variant="caption" color="text.secondary" textAlign="center">
+
+      <Typography variant="caption" color="text.secondary" fontWeight={600}>
         {label}
       </Typography>
-    </Stack>
+
+      <Typography
+        variant="caption"
+        color="text.disabled"
+        sx={{ lineHeight: 1.5, display: { xs: "none", sm: "block" } }}
+      >
+        {description}
+      </Typography>
+    </Box>
   );
 }
 
-function StatCellSkeleton() {
+function StatInfoCardSkeleton() {
   return (
-    <Stack alignItems="center" gap={0.5} sx={{ flex: 1 }}>
-      <Skeleton variant="circular" width={20} height={20} />
-      <Skeleton width={48} height={28} />
-      <Skeleton width={56} height={14} />
-    </Stack>
+    <Box
+      sx={{
+        bgcolor: "action.hover",
+        borderRadius: 2,
+        p: { xs: 1.5, sm: 2 },
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
+      <Skeleton variant="circular" width={24} height={24} sx={{ mb: 1 }} />
+      <Skeleton width={48} height={32} sx={{ mb: 0.5 }} />
+      <Skeleton width={64} height={14} sx={{ mb: 0.5 }} />
+      <Skeleton width="90%" height={12} />
+      <Skeleton width="70%" height={12} />
+    </Box>
   );
 }
 
@@ -70,7 +139,7 @@ export function PlatformStatsBar() {
   if (isError) return null;
 
   return (
-    <Card variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
+    <Box>
       <Typography
         variant="caption"
         color="text.secondary"
@@ -78,37 +147,35 @@ export function PlatformStatsBar() {
         textTransform="uppercase"
         letterSpacing={0.8}
         display="block"
-        mb={2}
+        mb={1.5}
       >
         Platform at a glance
       </Typography>
 
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: { xs: 1, sm: 2 },
-          // dividers between cells
-          "& > *:not(:last-child)": {
-            borderRight: "1px solid",
-            borderColor: "divider",
-            pr: { xs: 1, sm: 2 },
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(2, 1fr)",
+            sm: "repeat(4, 1fr)",
           },
+          gap: 1.5,
         }}
       >
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (
-              <StatCellSkeleton key={i} />
+              <StatInfoCardSkeleton key={i} />
             ))
-          : STATS_CONFIG.map(({ key, label, icon }) => (
-              <StatCell
+          : STATS_CONFIG.map(({ key, label, description, icon }) => (
+              <StatInfoCard
                 key={key}
                 icon={icon}
                 label={label}
+                description={description}
                 value={stats?.[key] ?? 0}
               />
             ))}
       </Box>
-    </Card>
+    </Box>
   );
 }

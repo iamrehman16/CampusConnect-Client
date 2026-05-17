@@ -1,36 +1,36 @@
-import {
-  Box,
-  Card,
-  Avatar,
-  Typography,
-  Chip,
-  Skeleton,
-  Stack,
-} from "@mui/material";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import { Box, Typography, Skeleton, Stack } from "@mui/material";
 import { useMyProfile } from "@/features/user/hooks/profile-hooks";
 import { useMyStats } from "@/features/dashboard/hooks/dashboard.hooks";
 import { UserRole } from "@/shared/types/enums";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function getGreeting(): string {
+function getGreeting(name: string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
+  const firstName = name.split(" ")[0];
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const messages = {
+    morning: [
+      `Rise and shine, {name} — let's make today count.`,
+      `Good morning, {name}. Your campus awaits.`,
+      `Morning, {name}! Great things start early.`,
+    ],
+    afternoon: [
+      `Good afternoon, {name}. Keep the momentum going.`,
+      `Hey {name}, the day's still young — keep pushing.`,
+      `Afternoon, {name}. Half the day done, half to go.`,
+    ],
+    evening: [
+      `Evening, {name}. Wrapping up or just getting started?`,
+      `Good evening, {name}. Night owls get things done too.`,
+      `Hey {name}, burning the midnight oil? We've got you.`,
+    ],
+  };
+
+  const bucket = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  const pool = messages[bucket];
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  return picked.replace("{name}", firstName);
 }
 
 function formatMemberSince(dateStr: string): string {
@@ -49,45 +49,41 @@ function getRoleLabel(role: UserRole): string {
   return map[role] ?? role;
 }
 
-// ─── Stat block ───────────────────────────────────────────────────────────────
+// ─── Stat dot separator ───────────────────────────────────────────────────────
 
-interface StatBlockProps {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-}
-
-function StatBlock({ icon, label, value }: StatBlockProps) {
+function Dot() {
   return (
-    <Box
-      sx={{
-        bgcolor: "action.hover",
-        borderRadius: 2,
-        px: 1.5,
-        py: 1.25,
-      }}
+    <Typography
+      component="span"
+      variant="caption"
+      color="text.disabled"
+      sx={{ mx: 0.75, userSelect: "none" }}
     >
-      <Stack direction="row" alignItems="center" gap={0.5} mb={0.5}>
-        <Box sx={{ color: "text.secondary", display: "flex", fontSize: 14 }}>
-          {icon}
-        </Box>
-        <Typography variant="caption" color="text.secondary" fontWeight={500}>
-          {label}
-        </Typography>
-      </Stack>
-      <Typography variant="h6" fontWeight={700} lineHeight={1}>
-        {value.toLocaleString()}
-      </Typography>
-    </Box>
+      ·
+    </Typography>
   );
 }
 
-function StatBlockSkeleton() {
+// ─── Single inline stat ───────────────────────────────────────────────────────
+
+interface InlineStatProps {
+  value: number;
+  label: string;
+}
+
+function InlineStat({ value, label }: InlineStatProps) {
   return (
-    <Box sx={{ bgcolor: "action.hover", borderRadius: 2, px: 1.5, py: 1.25 }}>
-      <Skeleton width={60} height={14} sx={{ mb: 0.5 }} />
-      <Skeleton width={40} height={28} />
-    </Box>
+    <Typography component="span" variant="caption" color="text.secondary">
+      <Typography
+        component="span"
+        variant="caption"
+        fontWeight={700}
+        color="text.primary"
+      >
+        {value.toLocaleString()}
+      </Typography>{" "}
+      {label}
+    </Typography>
   );
 }
 
@@ -98,103 +94,96 @@ export function GreetingStatsCard() {
   const { data: stats, isLoading: statsLoading } = useMyStats();
 
   const isLoading = profileLoading || statsLoading;
+  const isContributorOrAdmin =
+    profile?.role === UserRole.CONTRIBUTOR || profile?.role === UserRole.ADMIN;
+
+  if (isLoading) {
+    return (
+      <Box sx={{ py: { xs: 2, sm: 2.5 } }}>
+        <Skeleton width={320} height={36} sx={{ mb: 1 }} />
+        <Skeleton width={180} height={18} sx={{ mb: 2 }} />
+        <Skeleton width={260} height={16} />
+      </Box>
+    );
+  }
+
+  const greeting = profile?.name ? getGreeting(profile.name) : "";
+  // Split greeting at the name so we can style it separately
+  const firstName = profile?.name?.split(" ")[0] ?? "";
+  const [before, after] = greeting.split(firstName);
 
   return (
-    <Card variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
-      {/* ── Header row ── */}
-      <Stack direction="row" alignItems="center" gap={1.5} mb={2.5}>
-        {profileLoading ? (
-          <Skeleton variant="circular" width={48} height={48} />
-        ) : (
-          <Avatar
-            src={profile?.avatar}
-            sx={{
-              width: 48,
-              height: 48,
-              bgcolor: "primary.dark",
-              fontSize: "1rem",
-              fontWeight: 700,
-            }}
-          >
-            {profile?.name ? getInitials(profile.name) : "?"}
-          </Avatar>
-        )}
-
-        <Box>
-          {profileLoading ? (
-            <>
-              <Skeleton width={200} height={24} />
-              <Skeleton width={140} height={18} sx={{ mt: 0.5 }} />
-            </>
-          ) : (
-            <>
-              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-                {getGreeting()}, {profile?.name?.split(" ")[0]}
-              </Typography>
-              <Stack direction="row" alignItems="center" gap={1} mt={0.75}>
-                {profile?.createdAt && (
-                  <Typography variant="caption" color="text.secondary">
-                    Member since {formatMemberSince(profile.createdAt)}
-                  </Typography>
-                )}
-                {profile?.role && (
-                  <Chip
-                    label={getRoleLabel(profile.role)}
-                    size="small"
-                    sx={{
-                      height: 20,
-                      fontSize: "0.7rem",
-                      fontWeight: 600,
-                      bgcolor: "primary.dark",
-                      color: "primary.light",
-                      "& .MuiChip-label": { px: 1 },
-                    }}
-                  />
-                )}
-              </Stack>
-            </>
-          )}
-        </Box>
-      </Stack>
-
-      {/* ── Stat blocks ── */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(2, 1fr)",
-            sm: "repeat(4, 1fr)",
-          },
-          gap: 1.5,
-        }}
+    <Box sx={{ py: { xs: 2, sm: 2.5 } }}>
+      {/* ── Greeting line ── */}
+      <Typography
+        variant="h5"
+        fontWeight={700}
+        sx={{ lineHeight: 1.3, mb: 0.5 }}
       >
-        {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => <StatBlockSkeleton key={i} />)
-        ) : (
+        {before}
+        <Typography
+          component="span"
+          variant="h5"
+          fontWeight={700}
+          fontStyle="italic"
+          sx={{ color: "primary.light" }}
+        >
+          {firstName}
+        </Typography>
+        {after}
+      </Typography>
+
+      {/* ── Role + member since ── */}
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        {getRoleLabel(profile?.role ?? UserRole.STUDENT)}
+        {profile?.createdAt && (
           <>
-            <StatBlock
-              icon={<EditNoteIcon fontSize="inherit" />}
-              label="Posts"
-              value={stats?.postCount ?? 0}
-            />
-            <StatBlock
-              icon={<InsertDriveFileOutlinedIcon fontSize="inherit" />}
-              label="Resources"
-              value={stats?.resourceCount ?? 0}
-            />
-            <StatBlock
-              icon={<ArrowUpwardIcon fontSize="inherit" />}
-              label="Upvotes"
-              value={stats?.totalUpvotesReceived ?? 0}
-            />
-            <StatBlock
-              icon={<FileDownloadOutlinedIcon fontSize="inherit" />}
-              label="Downloads"
-              value={stats?.totalDownloads ?? 0}
-            />
+            <Typography
+              component="span"
+              variant="body2"
+              color="text.disabled"
+              sx={{ mx: 0.75 }}
+            >
+              ·
+            </Typography>
+            Member since {formatMemberSince(profile.createdAt)}
           </>
         )}
-      </Box>
-    </Card>
+      </Typography>
+
+      {/* ── Inline stats row ── */}
+      <Stack direction="row" alignItems="center" flexWrap="wrap" gap={0}>
+        {/* Students: posts + upvotes always */}
+        <InlineStat value={stats?.postCount ?? 0} label="posts" />
+        <Dot />
+        <InlineStat value={stats?.totalUpvotesReceived ?? 0} label="upvotes" />
+
+        {isContributorOrAdmin && (
+          <>
+            {/* Desktop: show resources + downloads always */}
+            <Box sx={{ display: { xs: "none", sm: "contents" } }}>
+              <Dot />
+              <InlineStat value={stats?.resourceCount ?? 0} label="resources" />
+              <Dot />
+              <InlineStat
+                value={stats?.totalDownloads ?? 0}
+                label="downloads"
+              />
+            </Box>
+
+            {/* Mobile: show resources + downloads only for contributor/admin */}
+            <Box sx={{ display: { xs: "contents", sm: "none" } }}>
+              <Dot />
+              <InlineStat value={stats?.resourceCount ?? 0} label="resources" />
+              <Dot />
+              <InlineStat
+                value={stats?.totalDownloads ?? 0}
+                label="downloads"
+              />
+            </Box>
+          </>
+        )}
+      </Stack>
+    </Box>
   );
 }

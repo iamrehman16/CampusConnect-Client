@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
-import RightRail from './RightRail';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -25,9 +24,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
         {children}
       </Box>
-
-      {/* Right rail — only on lg+ */}
-      <RightRail />
     </Box>
   );
 }
