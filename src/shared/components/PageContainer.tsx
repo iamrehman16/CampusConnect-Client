@@ -1,6 +1,5 @@
-import { Box } from "@mui/material";
-import type { ReactNode } from "react";
-import type { SxProps, Theme } from "@mui/material";
+import { Box,type Theme,type SxProps } from "@mui/material";
+import { type ReactNode } from "react";
 
 export function PageContainer({
   children,
@@ -10,7 +9,12 @@ export function PageContainer({
   sx?: SxProps<Theme>;
 }) {
   return (
-    <Box sx={[{ height: "100%", overflowY: "auto" }, sx]}>
+    <Box
+      sx={[
+        { height: "100%", overflowY: "auto" },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
+    >
       {children}
     </Box>
   );
