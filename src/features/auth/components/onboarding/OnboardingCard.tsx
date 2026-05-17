@@ -1,5 +1,5 @@
 import { Box, useTheme } from "@mui/material";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface OnboardingCardProps {
   children: ReactNode;

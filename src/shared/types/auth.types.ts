@@ -19,6 +19,7 @@ export interface User {
   contributionScore?: number;
   accountStatus?: string;
   createdAt:string;
+  academicInfo?: string;
 }
 
 /**
