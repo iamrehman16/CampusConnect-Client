@@ -1,7 +1,7 @@
 // shared/api/query-client.ts
-import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
-import { getApiErrorMessage } from '@/shared/utils/api-error';
-import toast from 'react-hot-toast';
+import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
+import { getApiErrorMessage } from "@/shared/utils/api-error";
+import toast from "react-hot-toast";
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -12,8 +12,9 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      retry: 2,
+      gcTime: 1000 * 60 * 60 * 24, // keep cache for 24h (must match persister maxAge)
       staleTime: 1000 * 60 * 5,
+      retry: 2,
     },
     mutations: {
       retry: 0,
