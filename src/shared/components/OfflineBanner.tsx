@@ -14,6 +14,11 @@ export function OfflineBanner() {
           borderRadius: 0,
           py: 0.5,
           fontSize: '0.8rem',
+          bgcolor: 'warning.main',
+          color: 'warning.contrastText',
+          '& .MuiAlert-icon': {
+            color: 'warning.contrastText',
+          },
         }}
       >
         You're offline — showing cached data
