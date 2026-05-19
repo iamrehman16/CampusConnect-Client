@@ -103,7 +103,7 @@ export default function ConversationPage() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "100svh",
         overflow: "hidden",
         bgcolor: "background.default",
       }}
@@ -124,7 +124,7 @@ export default function ConversationPage() {
         }}
       >
         {isMobile && (
-          <IconButton size="small" onClick={() => navigate("/chat")} sx={{ minWidth: 44, minHeight: 44 }}>
+          <IconButton size="small" onClick={() => navigate(-1)} sx={{ minWidth: 44, minHeight: 44 }}>
             <ArrowBack fontSize="small" />
           </IconButton>
         )}

@@ -1,132 +1,56 @@
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import Badge from "@mui/material/Badge";
-import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/shared/hooks/useAuth";
-import { ROUTES } from "@/shared/constants/routes";
-import { useChatUIStore } from "@/features/chat/store/chat-ui.store";
-import { useThemeModeContext } from "@/shared/hooks/useThemeModeContext";
-import SmsIcon from "@mui/icons-material/Sms";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { usePwaInstall } from "@/shared/hooks/usePwaInstall";
-import { Button } from "@mui/material";
-import { InstallMobileRounded } from "@mui/icons-material";
+// src/layout/TopBar.tsx
+import { useLocation } from "react-router-dom";
+import { getRouteConfig} from '../../../app/routeConfig';
+import StandardBar from "./topbar/StandardBar";
+import ContextualBar from "./topbar/ContextualBar";
 
 interface TopBarProps {
+  /**
+   * Passed through from AppLayout → ProfileDrawer.
+   * Only StandardBar uses this — ContextualBar has no avatar.
+   * We accept it here so AppLayout's interface stays unchanged.
+   */
   onAvatarClick: () => void;
 }
 
+/**
+ * TopBar — thin routing-aware switcher.
+ *
+ * This component has exactly one job: read the current route config
+ * and render the right bar variant. No layout logic, no business logic.
+ *
+ * Why does the switcher live here and not in AppLayout?
+ * AppLayout manages the overall page structure (sidebar, main area,
+ * bottom nav). Knowing *which* bar variant to render is a TopBar concern.
+ * Keeping it here means AppLayout stays unchanged when we add new modes.
+ *
+ * Why not just pass topBarMode as a prop from AppLayout?
+ * AppLayout would then need to call useLocation + getRouteConfig itself,
+ * making it routing-aware. We want AppLayout to stay a dumb structural
+ * shell. One component reads the route; everything else receives props.
+ */
 export default function TopBar({ onAvatarClick }: TopBarProps) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { mode, toggle } = useThemeModeContext();
-  const totalUnread = useChatUIStore((s) =>
-    Object.values(s.unreadCounts).reduce((sum, n) => sum + n, 0),
-  );
+  const { pathname } = useLocation();
+  const config = getRouteConfig(pathname);
 
-  const { isInstallable, triggerInstall } = usePwaInstall();
+  if (config.topBarMode === "immersive") {
+    // Immersive pages own their header entirely.
+    // AppShell renders nothing here — the page component takes over.
+    return null;
+  }
 
-  return (
-    <AppBar
-      position="fixed"
-      elevation={0}
-      sx={{
-        display: { xs: "flex", md: "none" },
-        bgcolor: "background.paper",
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        color: "text.primary",
-        zIndex: (theme) => theme.zIndex.appBar,
-      }}
-    >
-      <Toolbar
-        sx={{
-          px: 2,
-          minHeight: 56,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Left — avatar opens profile drawer */}
-        <IconButton onClick={onAvatarClick} size="small" sx={{ p: 0 }}>
-          <Avatar
-            sx={{
-              width: 32,
-              height: 32,
-              fontSize: "0.875rem",
-              fontWeight: 700,
-              bgcolor: "primary.main",
-              color: "primary.contrastText",
-            }}
-          >
-            {user?.name?.charAt(0).toUpperCase()}
-          </Avatar>
-        </IconButton>
+  if (config.topBarMode === "contextual") {
+    // action slot is undefined here — each page that needs a right-side
+    // action (compose button on Messages, search on Contributors) will
+    // render it inside its own page component, positioned absolutely or
+    // via a portal, so ContextualBar stays generic with no page knowledge.
+    //
+    // Alternative: pass action via React context or a layout store.
+    // We'll address that when we build ConversationsPage — for now the
+    // slot exists and is ready.
+    return <ContextualBar title={config.title} />;
+  }
 
-        {/* Center — app name */}
-        <Typography
-          variant="subtitle1"
-          fontWeight={700}
-          color="primary.main"
-          sx={{
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }}
-        >
-          CampusConnect
-        </Typography>
-
-        {
-          isInstallable && (
-            <Button
-              size="small"
-              variant="outlined"
-              color="secondary"
-              startIcon={<InstallMobileRounded />}
-              onClick={triggerInstall}
-            >
-              Install App
-            </Button>
-          )
-        }
-
-        {/* Right — theme toggle + messenger with unread badge */}
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <IconButton
-            onClick={toggle}
-            size="small"
-            sx={{ color: "text.secondary" }}
-          >
-            {mode === "dark" ? (
-              <LightModeIcon fontSize="small" />
-            ) : (
-              <DarkModeIcon fontSize="small" />
-            )}
-          </IconButton>
-
-          <IconButton
-            onClick={() => navigate(ROUTES.CHAT)}
-            size="small"
-            sx={{ color: "text.secondary" }}
-          >
-            <Badge
-              badgeContent={totalUnread}
-              color="error"
-              max={99}
-              sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem" } }}
-            >
-              <SmsIcon fontSize="small" />
-            </Badge>
-          </IconButton>
-        </Stack>
-      </Toolbar>
-    </AppBar>
-  );
+  // default: 'standard'
+  return <StandardBar title={config.title} onAvatarClick={onAvatarClick} />;
 }

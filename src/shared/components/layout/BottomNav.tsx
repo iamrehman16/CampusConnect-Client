@@ -48,7 +48,7 @@ export default function BottomNav() {
       <BottomNavigation
         value={activeIndex === -1 ? 0 : activeIndex}
         onChange={(_, newValue) => {
-          navigate(NAV_ITEMS[newValue].path);
+          navigate(NAV_ITEMS[newValue].path, { replace: true });
         }}
         showLabels
         sx={{

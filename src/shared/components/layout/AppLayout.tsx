@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -8,6 +8,7 @@ import BottomNav from "./BottomNav";
 import TopBar from "./TopBar";
 import ProfileDrawer from "./ProfileDrawer";
 import { useUIStore } from "@/shared/store/ui.store";
+import { getRouteConfig } from "@/app/routeConfig";
 
 /**
  * Main application layout shell.
@@ -22,6 +23,9 @@ export default function AppLayout() {
     ? SIDEBAR_COLLAPSED_WIDTH
     : SIDEBAR_WIDTH;
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false);
+  const { pathname } = useLocation();
+  const { showBottomNav, topBarMode } = getRouteConfig(pathname);
+  const isImmersive = topBarMode === "immersive";
 
   return (
     <>
@@ -37,8 +41,8 @@ export default function AppLayout() {
           sx={{
             flexGrow: 1,
             width: isDesktop ? `calc(100% - ${sidebarWidth}px)` : "100%",
-            pt: { xs: "56px", md: 0 },
-            pb: { xs: "64px", md: 0 },
+            pt: { xs: isImmersive ? 0 : "56px", md: 0 },
+            pb: { xs: showBottomNav ? "64px" : 0, md: 0 },
             overflow: "hidden",
             bgcolor: "background.default",
             transition: theme.transitions.create("width", {
@@ -49,7 +53,7 @@ export default function AppLayout() {
         >
           <Outlet />
         </Box>
-        {!isDesktop && <BottomNav />}
+        {!isDesktop && showBottomNav && <BottomNav />}
       </Box>
     </>
   );
