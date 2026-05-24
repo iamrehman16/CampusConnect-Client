@@ -75,7 +75,7 @@ export default function AiChatPage() {
         {/* Left — back arrow */}
         <IconButton
           size="small"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/", { replace: true })}
           sx={{ color: "text.primary", flexShrink: 0 }}
           aria-label="Go back"
         >
