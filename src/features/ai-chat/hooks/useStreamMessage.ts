@@ -9,7 +9,8 @@ import type { ChatMessageDto, ConversationMessage } from "../types/ai-chat.dto";
 
 export function useStreamMessage() {
   const queryClient = useQueryClient();
-  const [streamingBubble, setStreamingBubble] = useState<ConversationMessage | null>(null);
+  const [streamingBubble, setStreamingBubble] =
+    useState<ConversationMessage | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
 
   const refs = useStreamRefs();
@@ -18,7 +19,10 @@ export function useStreamMessage() {
   const { startDrainInterval, waitForDrainThenCommit, commitOnAbort, cleanup } =
     useDrainQueue({ refs, setStreamingBubble, setIsStreaming });
 
-  const stop = useCallback(() => abortRef.current?.abort(), [abortRef]);
+  const stop = useCallback(() => {
+    console.log("[STOP CALLED]", abortRef.current);
+    abortRef.current?.abort();
+  }, [abortRef]);
 
   const sendMessage = useCallback(
     async (dto: ChatMessageDto) => {
@@ -44,14 +48,22 @@ export function useStreamMessage() {
       setIsStreaming(true);
       startDrainInterval();
 
+      const handleAbort = () => {
+        commitOnAbort(assistantBubbleId);
+      };
+      controller.signal.addEventListener("abort", handleAbort);
+
       try {
-        for await (const event of aiChatService.streamMessage(dto, controller.signal)) {
+        for await (const event of aiChatService.streamMessage(
+          dto,
+          controller.signal,
+        )) {
           if (event.type === "token") {
             accRef.current += event.token;
             queueRef.current.push(...event.token.split(""));
           } else if (event.type === "citations") {
             setStreamingBubble((prev) =>
-              prev ? { ...prev, citations: event.citations } : prev
+              prev ? { ...prev, citations: event.citations } : prev,
             );
           } else if (event.type === "done") {
             waitForDrainThenCommit(assistantBubbleId);
@@ -61,12 +73,21 @@ export function useStreamMessage() {
           }
         }
       } catch (err: unknown) {
-        const isAbort = err instanceof DOMException && err.name === "AbortError";
+        console.log(
+          "[HOOK CATCH]",
+          err,
+          err instanceof DOMException,
+          (err as any)?.name,
+        );
+        const isAbort =
+          err instanceof DOMException && err.name === "AbortError";
         if (isAbort) {
-          commitOnAbort(assistantBubbleId);
+          // handled by the event listener above
         } else {
           cleanup();
         }
+      } finally {
+        controller.signal.removeEventListener("abort", handleAbort);
       }
     },
     [

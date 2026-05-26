@@ -54,22 +54,66 @@ export class AiChatService {
     const decoder = new TextDecoder();
     let buffer = "";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() ?? "";
-      for (const part of parts) {
-        const line = part.trim();
-        if (!line.startsWith("data:")) continue;
-        const raw = line.slice(5).trim();
-        try {
-          yield JSON.parse(raw) as SseEvent;
-        } catch {
-          // malformed chunk — skip
+    const onAbort = () => {
+      reader.cancel().catch(() => {});
+    };
+
+    if (signal.aborted) {
+      onAbort();
+    } else {
+      signal.addEventListener("abort", onAbort);
+    }
+
+    try {
+      while (true) {
+        if (signal.aborted) {
+          throw new DOMException("Aborted", "AbortError");
+        }
+        
+        // Wrap reader.read() to ensure it aggressively rejects immediately on abort.
+        // Some environments/polyfills do not immediately unblock reader.read() when cancel() is called.
+        const { done, value } = await new Promise<ReadableStreamReadResult<Uint8Array>>((resolve, reject) => {
+          const abortHandler = () => reject(new DOMException("Aborted", "AbortError"));
+          
+          if (signal.aborted) {
+            abortHandler();
+            return;
+          }
+          
+          signal.addEventListener("abort", abortHandler);
+          
+          reader.read().then(resolve, reject).finally(() => {
+            signal.removeEventListener("abort", abortHandler);
+          });
+        });
+        
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() ?? "";
+        for (const part of parts) {
+          const line = part.trim();
+          if (!line.startsWith("data:")) continue;
+          const raw = line.slice(5).trim();
+          try {
+            yield JSON.parse(raw) as SseEvent;
+            console.log("[GENERATOR RESUMED]", signal.aborted);
+          } catch {
+            // malformed chunk — skip
+          }
         }
       }
+    } catch (err) {
+      console.log(
+        "[SERVICE CATCH]",
+        err,
+        err instanceof DOMException,
+        (err as any)?.name,
+      );
+      reader.cancel().catch(() => {});
+      throw err; // re-throw so for await catch in the hook sees it
+    } finally {
+      signal.removeEventListener("abort", onAbort);
     }
   }
 }

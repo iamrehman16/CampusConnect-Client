@@ -6,7 +6,9 @@ import type { useStreamRefs } from "./useStreamRefs";
 
 interface UseDrainQueueOptions {
   refs: ReturnType<typeof useStreamRefs>;
-  setStreamingBubble: React.Dispatch<React.SetStateAction<ConversationMessage | null>>;
+  setStreamingBubble: React.Dispatch<
+    React.SetStateAction<ConversationMessage | null>
+  >;
   setIsStreaming: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -24,7 +26,7 @@ export function useDrainQueue({
       const char = queueRef.current.shift()!;
       renderRef.current += char;
       setStreamingBubble((prev) =>
-        prev ? { ...prev, content: renderRef.current } : prev
+        prev ? { ...prev, content: renderRef.current } : prev,
       );
     }, 4);
   }, [flushRef, queueRef, renderRef, setStreamingBubble]);
@@ -65,12 +67,13 @@ export function useDrainQueue({
   const commitOnAbort = useCallback(
     (assistantBubbleId: string) => {
       clearInterval(flushRef.current!);
+      queueRef.current = []; // ← drain the queue so no pending interval tick can revive the bubble
       setConversation(queryClient, (prev) => [
         ...prev,
         {
           id: assistantBubbleId,
           role: "assistant" as const,
-          content: renderRef.current, // only what was actually painted
+          content: renderRef.current,
           isPending: false,
         },
       ]);
@@ -78,7 +81,15 @@ export function useDrainQueue({
       setIsStreaming(false);
       reset();
     },
-    [queryClient, renderRef, flushRef, reset, setStreamingBubble, setIsStreaming],
+    [
+      queryClient,
+      renderRef,
+      flushRef,
+      queueRef,
+      reset,
+      setStreamingBubble,
+      setIsStreaming,
+    ],
   );
 
   const cleanup = useCallback(() => {

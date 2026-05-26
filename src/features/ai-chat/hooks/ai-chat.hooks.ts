@@ -13,7 +13,6 @@ import type {
   ChatResponseDto,
   ConversationMessage,
 } from "../types/ai-chat.dto";
-import { useCallback, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // Mutation context — typed explicitly to avoid casting in onSuccess/onError
 // ---------------------------------------------------------------------------
