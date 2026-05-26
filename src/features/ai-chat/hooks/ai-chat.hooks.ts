@@ -1,11 +1,19 @@
 // hooks/ai-chat.hooks.ts
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { aiChatService } from '../services/ai-chat.service';
-import { aiChatKeys } from './ai-chat.keys';
-import { getConversation, setConversation, clearConversation } from '../utils/ai-chat.cache';
-import { generateId } from '../utils/generate-id';
-import type { ChatMessageDto, ChatResponseDto, ConversationMessage } from '../types/ai-chat.dto';
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { aiChatService } from "../services/ai-chat.service";
+import { aiChatKeys } from "./ai-chat.keys";
+import {
+  getConversation,
+  setConversation,
+  clearConversation,
+} from "../utils/ai-chat.cache";
+import { generateId } from "../utils/generate-id";
+import type {
+  ChatMessageDto,
+  ChatResponseDto,
+  ConversationMessage,
+} from "../types/ai-chat.dto";
+import { useCallback, useRef, useState } from "react";
 // ---------------------------------------------------------------------------
 // Mutation context — typed explicitly to avoid casting in onSuccess/onError
 // ---------------------------------------------------------------------------
@@ -41,7 +49,12 @@ export function useConversation() {
 export function useSendMessage() {
   const queryClient = useQueryClient();
 
-  return useMutation<ChatResponseDto, Error, ChatMessageDto, SendMessageContext>({
+  return useMutation<
+    ChatResponseDto,
+    Error,
+    ChatMessageDto,
+    SendMessageContext
+  >({
     mutationFn: (dto) => aiChatService.sendMessage(dto),
 
     onMutate: async (dto) => {
@@ -52,8 +65,8 @@ export function useSendMessage() {
 
       setConversation(queryClient, (prev) => [
         ...prev,
-        { id: generateId(), role: 'user', content: dto.message },
-        { id: skeletonId, role: 'assistant', content: '', isPending: true },
+        { id: generateId(), role: "user", content: dto.message },
+        { id: skeletonId, role: "assistant", content: "", isPending: true },
       ]);
 
       return { snapshot, skeletonId };
@@ -63,7 +76,12 @@ export function useSendMessage() {
       setConversation(queryClient, (prev) =>
         prev.map((msg) =>
           msg.id === skeletonId
-            ? { ...msg, content: response.answer, citations: response.citations, isPending: false }
+            ? {
+                ...msg,
+                content: response.answer,
+                citations: response.citations,
+                isPending: false,
+              }
             : msg,
         ),
       );

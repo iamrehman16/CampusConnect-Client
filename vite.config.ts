@@ -84,6 +84,11 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: "http://localhost:3100",
           changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on("proxyReq", (proxyReq) => {
+              proxyReq.setHeader("Accept-Encoding", "identity");
+            });
+          },
         },
       },
     },

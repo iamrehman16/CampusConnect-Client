@@ -1,22 +1,31 @@
-import { useState, useRef,  } from 'react';
+// src/features/ai-chat/components/ChatInput.tsx
+import { useState, useRef } from 'react';
 import { Box, IconButton, Typography, TextField } from '@mui/material';
-import Send from '@mui/icons-material/Send';
+import SendIcon from '@mui/icons-material/Send';
+import StopIcon from '@mui/icons-material/Stop';
 
 const MAX_CHARS = 1000;
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled: boolean;
-  /** Allows the parent to seed the input (e.g. suggestion chips). */
+  isStreaming?: boolean;
+  onStop?: () => void;
   prefillValue?: string;
   onPrefillConsumed?: () => void;
 }
 
-export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  disabled,
+  isStreaming,
+  onStop,
+  prefillValue,
+  onPrefillConsumed,
+}: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync prefill from parent (suggestion chips)
   if (prefillValue !== undefined && prefillValue !== value) {
     setValue(prefillValue);
     onPrefillConsumed?.();
@@ -37,13 +46,15 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      // If streaming, Enter also stops — feels natural
+      if (isStreaming) { onStop?.(); return; }
       handleSend();
     }
   };
 
   const charCount = value.length;
   const isOverLimit = charCount > MAX_CHARS;
-  const showCounter = charCount > MAX_CHARS * 0.8; // show counter at 80% usage
+  const showCounter = charCount > MAX_CHARS * 0.8;
   const canSend = value.trim().length > 0 && !disabled && !isOverLimit;
 
   return (
@@ -53,7 +64,7 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
           fullWidth
           multiline
           maxRows={4}
-          placeholder="Ask a question…"
+          placeholder={isStreaming ? 'Responding…' : 'Ask a question…'}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -74,32 +85,54 @@ export function ChatInput({ onSend, disabled, prefillValue, onPrefillConsumed }:
             },
           }}
         />
-        <IconButton
-          size="small"
-          onClick={handleSend}
-          disabled={!canSend}
-          sx={{
-            width: 40,
-            height: 40,
-            flexShrink: 0,
-            mb: 0.25,
-            bgcolor: canSend ? 'primary.main' : 'action.disabledBackground',
-            color: canSend ? 'primary.contrastText' : 'text.disabled',
-            borderRadius: '50%',
-            '&:hover': {
-              bgcolor: canSend ? 'primary.dark' : 'action.disabledBackground',
-            },
-            '&.Mui-disabled': {
-              bgcolor: 'action.disabledBackground',
-              color: 'text.disabled',
-            },
-          }}
-        >
-          <Send sx={{ fontSize: 18 }} />
-        </IconButton>
+
+        {/* Send / Stop toggle */}
+        {isStreaming ? (
+          <IconButton
+            size="small"
+            onClick={onStop}
+            aria-label="Stop response"
+            sx={{
+              width: 40,
+              height: 40,
+              flexShrink: 0,
+              mb: 0.25,
+              bgcolor: 'error.main',
+              color: '#fff',
+              borderRadius: '50%',
+              '&:hover': { bgcolor: 'error.dark' },
+            }}
+          >
+            <StopIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        ) : (
+          <IconButton
+            size="small"
+            onClick={handleSend}
+            disabled={!canSend}
+            aria-label="Send message"
+            sx={{
+              width: 40,
+              height: 40,
+              flexShrink: 0,
+              mb: 0.25,
+              bgcolor: canSend ? 'primary.main' : 'action.disabledBackground',
+              color: canSend ? 'primary.contrastText' : 'text.disabled',
+              borderRadius: '50%',
+              '&:hover': {
+                bgcolor: canSend ? 'primary.dark' : 'action.disabledBackground',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'action.disabledBackground',
+                color: 'text.disabled',
+              },
+            }}
+          >
+            <SendIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        )}
       </Box>
 
-      {/* Character counter — only visible at 80%+ usage */}
       {showCounter && (
         <Typography
           variant="caption"
