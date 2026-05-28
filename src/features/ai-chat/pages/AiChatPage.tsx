@@ -14,7 +14,8 @@ export default function AiChatPage() {
   const [prefill, setPrefill] = useState<string | undefined>(undefined);
 
   const { data: messages } = useConversation();
-  const { sendMessage, stop, isStreaming, streamingBubble } = useStreamMessage();
+  const { sendMessage, stop, isStreaming, isFetching, streamingBubble } =
+    useStreamMessage();
   const { mutate: clearSession } = useClearSession();
 
   const { scrollContainerRef, bottomRef, showScrollBtn, scrollToBottom } =
@@ -66,8 +67,8 @@ export default function AiChatPage() {
       >
         <ChatInput
           onSend={(message) => sendMessage({ message })}
-          disabled={isStreaming}
-          isStreaming={isStreaming}
+          disabled={isStreaming} // input disabled for full duration
+          isStreaming={isFetching} // stop button visible only while fetch is live
           onStop={stop}
           prefillValue={prefill}
           onPrefillConsumed={() => setPrefill(undefined)}

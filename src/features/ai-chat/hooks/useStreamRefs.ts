@@ -1,17 +1,22 @@
-import { useRef } from "react";
+// useStreamRefs.ts — inferred from usage, adding 2 new refs
+import { useCallback, useRef } from "react";
 
 export function useStreamRefs() {
-  const abortRef = useRef<AbortController | null>(null);
-  const accRef = useRef("");        // full accumulated text
-  const queueRef = useRef<string[]>([]); // chars waiting to render
-  const renderRef = useRef("");     // what has actually been painted
-  const flushRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const accRef    = useRef("");
+  const queueRef  = useRef<string[]>([]);
+  const renderRef = useRef("");
+  const flushRef  = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const fetchCompleteRef = useRef(false); // true once event.type === "done" received
+  const pollCancelRef    = useRef(false); // cancels waitForDrainThenCommit poll
 
-  const reset = () => {
-    accRef.current = "";
-    queueRef.current = [];
-    renderRef.current = "";
-  };
+  const reset = useCallback(() => {
+    accRef.current         = "";
+    queueRef.current       = [];
+    renderRef.current      = "";
+    fetchCompleteRef.current = false;
+    pollCancelRef.current    = false;
+    // flushRef cleared by clearInterval inside commit fns, not here
+  }, []);
 
-  return { abortRef, accRef, queueRef, renderRef, flushRef, reset };
+  return { accRef, queueRef, renderRef, flushRef, fetchCompleteRef, pollCancelRef, reset };
 }
